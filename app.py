@@ -1,6 +1,6 @@
 import streamlit as st
 
-# إعدادات الصفحة والتصميم العربي (RTL)
+# إعدادات الصفحة والتصميم العربي (RTL) وتصميم عصري زاهي
 st.set_page_config(
     page_title="المنصة البيداغوجية للتكوين المهني - APC",
     page_icon="🎓",
@@ -13,16 +13,67 @@ st.markdown("""
         direction: rtl;
         text-align: right;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #F8FAFC;
     }
-    .main-header { font-size: 26px; font-weight: bold; color: #1E3A8A; text-align: center; margin-bottom: 5px; }
-    .sub-header { font-size: 15px; color: #4B5563; text-align: center; margin-bottom: 20px; }
-    .watermark { position: fixed; bottom: 10px; left: 10px; opacity: 0.2; font-size: 13px; font-weight: bold; z-index: 1000; }
-    .breadcrumb { font-size: 14px; color: #2563EB; background-color: #EFF6FF; padding: 10px 14px; border-radius: 8px; margin-bottom: 20px; border-right: 5px solid #2563EB; }
-    .stButton>button { width: 100%; border-radius: 6px; }
+    .main-header { 
+        font-size: 30px; 
+        font-weight: 800; 
+        color: #1E3A8A; 
+        text-align: center; 
+        margin-bottom: 5px; 
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    }
+    .sub-header { 
+        font-size: 16px; 
+        color: #0D9488; 
+        text-align: center; 
+        margin-bottom: 25px; 
+        font-weight: 600;
+    }
+    .watermark { 
+        position: fixed; 
+        bottom: 10px; 
+        left: 10px; 
+        opacity: 0.3; 
+        font-size: 12px; 
+        font-weight: bold; 
+        z-index: 1000; 
+        color: #1E3A8A;
+    }
+    .breadcrumb { 
+        font-size: 15px; 
+        color: #1E40AF; 
+        background-color: #DBEAFE; 
+        padding: 12px 18px; 
+        border-radius: 10px; 
+        margin-bottom: 20px; 
+        border-right: 6px solid #2563EB; 
+        font-weight: 600;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .stButton>button { 
+        width: 100%; 
+        border-radius: 8px; 
+        font-weight: bold;
+        transition: all 0.3s ease;
+    }
+    .stButton>button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    /* تصميم البطاقات الملونة الواضحة */
+    .card-box {
+        background-color: #FFFFFF;
+        padding: 20px;
+        border-radius: 12px;
+        border: 1px solid #E2E8F0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        margin-bottom: 15px;
+    }
     </style>
 """, unsafe_allow_html=True)
 
-# قاعدة البيانات الشاملة داخل الملف مباشرة لتجنب أخطاء الربط
+# قاعدة البيانات الشاملة (تشمل البرامج الثلاثة: المرأة الماكثة، التكوين الحضوري، و CAP)
 PLATFORM_DATA = {
     "programs": [
         {
@@ -42,7 +93,7 @@ PLATFORM_DATA = {
                                 {
                                     "id": "subj_trad_1",
                                     "title": "مقياس العجائن والمعسلات التقليدية",
-                                    "syllabus": "مخطط المقياس: دراسة عجائن المقيض والدزريات والمعسلات.",
+                                    "syllabus": "مخطط المقياس: دراسة عجائن المقروط والدزريات والمعسلات.",
                                     "lessons": [
                                         {
                                             "id": "les_dziriette",
@@ -169,10 +220,107 @@ PLATFORM_DATA = {
             ]
         },
         {
+            "id": "prog_present",
+            "title": "برنامج التكوين الحضوري",
+            "description": "التكوين النظامي الحضوري الموجه للمتمهنين والمتربصين بالمؤسسات.",
+            "specialties": [
+                {
+                    "id": "spec_present_general",
+                    "title": "تخصص فنون الطهي والحلويات النظامية",
+                    "code": "PRES_01",
+                    "modules": [
+                        {
+                            "id": "mod_pres_1",
+                            "title": "وحدة أساسيات المخبر والامن المهني",
+                            "subjects": [
+                                {
+                                    "id": "subj_pres_1",
+                                    "title": "مقياس نظافة وتطهير محيط العمل",
+                                    "syllabus": "مخطط المقياس: قواعد النظافة الصحية في مخبر الحلويات (HACCP).",
+                                    "lessons": [
+                                        {
+                                            "id": "les_hygiene",
+                                            "title": "درس تطبيق قواعد النظافة والأمن بالمخبر",
+                                            "trainee_content": {
+                                                "description": "التعرف على معايير نظافة الأسطح، المعدات، والنظافة الشخصية.",
+                                                "activities": "تطبيق عملية تعقيم طاولات العمل.",
+                                                "quiz": "ما هي درجات الحرارة المناسبة لغسل أدوات الحلويات الدهنية؟"
+                                            },
+                                            "teacher_content": {
+                                                "apc_plan": "مخطط درس الأمن الصناعي.",
+                                                "objectives": "ترسيخ ثقافة السلامة المهنية للمتربص.",
+                                                "evaluation_grid": "الالتزام بلباس المخبر والنظافة العامة.",
+                                                "model_answers": "الإجابة النموذجية لمعايير الاعتماد الصحي.",
+                                                "technical_card": {
+                                                    "title": "البطاقة التقنية: محلول التعقيم القياسي",
+                                                    "base_portions": 1,
+                                                    "ingredients": [
+                                                        {"item": "ماء دافئ", "qty": 1000, "unit": "ملليتر"},
+                                                        {"item": "مطهير معتمد (جافيل مخفف)", "qty": 10, "unit": "ملليتر"}
+                                                    ]
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "id": "prog_cap",
             "title": "شهادة الكفاءة المهنية (CAP)",
-            "description": "برنامج التكوين المهني الأساسي.",
-            "specialties": []
+            "description": "برنامج التكوين المهني الأساسي للحصول على شهادة الكفاءة المهنية.",
+            "specialties": [
+                {
+                    "id": "spec_cap_pat",
+                    "title": "تخصص صانع حلويات محترف (CAP Patissier)",
+                    "code": "CAP_01",
+                    "modules": [
+                        {
+                            "id": "mod_cap_1",
+                            "title": "وحدة الحلويات الأساسية لشهادة الكفاءة",
+                            "subjects": [
+                                {
+                                    "id": "subj_cap_1",
+                                    "title": "مقياس العجائن المخمرة والمنفوخة",
+                                    "syllabus": "مخطط المقياس: تحضير الكرواسون والبريوش.",
+                                    "lessons": [
+                                        {
+                                            "id": "les_croissant",
+                                            "title": "درس تحضير الكرواسون الفرنسي بالتفصيل",
+                                            "trainee_content": {
+                                                "description": "عجن العجينة الابتدائية، التوريق، والتشكيل الهلالي.",
+                                                "activities": "حساب طبقات التوريق والتحكم في زبدة التبريد.",
+                                                "quiz": "لماذا يجب تبريد العجين بين طيات التوريق؟"
+                                            },
+                                            "teacher_content": {
+                                                "apc_plan": "مخطط بيداغوجي لدرس الكرواسون الرسمي.",
+                                                "objectives": "إتقان تقنية التوريق الفردي والمزدوج.",
+                                                "evaluation_grid": "وضوح الطبقات من الداخل، اللون الذهبي، والقرمشة.",
+                                                "model_answers": "طريقة معالجة ذوبان الزبدة أثناء التوريق.",
+                                                "technical_card": {
+                                                    "title": "البطاقة التقنية: عجين الكرواسون الأساسي",
+                                                    "base_portions": 15,
+                                                    "ingredients": [
+                                                        {"item": "فرينة الخبز", "qty": 500, "unit": "غرام"},
+                                                        {"item": "زبدة التوريق", "qty": 250, "unit": "غرام"},
+                                                        {"item": "حليب دافئ", "qty": 250, "unit": "ملليتر"},
+                                                        {"item": "سكر", "qty": 50, "unit": "غرام"},
+                                                        {"item": "خميرة الخباز", "qty": 10, "unit": "غرام"}
+                                                    ]
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
         }
     ]
 }
@@ -186,18 +334,21 @@ if 'selected_subj_id' not in st.session_state: st.session_state.selected_subj_id
 if 'selected_les_id' not in st.session_state: st.session_state.selected_les_id = None
 if 'user_role' not in st.session_state: st.session_state.user_role = 'trainee'
 
+# ترويسة المنصة
 st.markdown('<div class="main-header">🎓 المنصة البيداغوجية للتكوين المهني (APC)</div>', unsafe_allow_html=True)
 st.markdown('<div class="sub-header">إشراف وتصميم بيداغوجي: الأستاذة فرحي حورية</div>', unsafe_allow_html=True)
 st.markdown('<div class="watermark">إعداد الأستاذة فرحي حورية ©</div>', unsafe_allow_html=True)
 
-# شريط التحكم بالصلاحيات
+# شريط التحكم بالصلاحيات الجانبي
 with st.sidebar:
     st.header("⚙️ لوحة المعاينة والصلاحيات")
     role_choice = st.radio("نوع المستخدم (معاينة الواجهة):", ["👨‍🎓 متربص (Trainee)", "👨‍🏫 أستاذ (Teacher)"])
     st.session_state.user_role = 'teacher' if "أستاذ" in role_choice else 'trainee'
     st.divider()
+    st.info("💡 هذه اللوحة تمكنكِ من المعاينة برؤية المتربص أو الأستاذ المحمي.")
     st.caption("جميع الحقوق محفوظة للأستاذة فرحي حورية ©")
 
+# شريط البحث والعودة للرئيسية
 col_nav1, col_nav2 = st.columns([3, 1])
 with col_nav1:
     search_q = st.text_input("🔍 بحث في المناهج والدروس...", placeholder="ابحث عن درس أو وحدة...")
@@ -236,14 +387,19 @@ def render_breadcrumbs():
 
 render_breadcrumbs()
 
+# الصفحة الرئيسية بتصميم زاهي ومنظم في بطاقات
 if st.session_state.current_page == 'home':
-    st.subheader("📌 اختر برنامج التكوين")
+    st.markdown("### 📌 اختر برنامج التكوين المهني:")
     cols = st.columns(len(PLATFORM_DATA["programs"]))
     for idx, prog in enumerate(PLATFORM_DATA["programs"]):
         with cols[idx]:
-            st.markdown(f"### {prog['title']}")
-            st.write(prog['description'])
-            if st.button(f"دخول {prog['title']}", key=prog['id'], use_container_width=True):
+            st.markdown(f"""
+                <div class="card-box" style="border-top: 5px solid #2563EB;">
+                    <h3 style="color: #1E3A8A; font-size: 20px;">{prog['title']}</h3>
+                    <p style="color: #4B5563; font-size: 14px; min-height: 50px;">{prog['description']}</p>
+                </div>
+            """, unsafe_allow_html=True)
+            if st.button(f"📂 دخول {prog['title']}", key=prog['id'], use_container_width=True):
                 st.session_state.selected_prog_id = prog['id']
                 st.session_state.current_page = 'specialties'
                 st.rerun()
@@ -256,7 +412,13 @@ elif st.session_state.current_page == 'specialties':
     curr_prog = next(p for p in PLATFORM_DATA["programs"] if p["id"] == st.session_state.selected_prog_id)
     st.subheader(f"📂 التخصصات المتاحة - {curr_prog['title']}")
     for spec in curr_prog["specialties"]:
-        if st.button(f"🎓 تخصص: {spec['title']} ({spec['code']})", key=spec['id'], use_container_width=True):
+        st.markdown(f"""
+            <div class="card-box" style="border-right: 5px solid #0D9488;">
+                <h4 style="color: #0F766E;">🎓 تخصص: {spec['title']}</h4>
+                <p style="color: #64748B; margin: 0;">رمز التخصص: <b>{spec['code']}</b></p>
+            </div>
+        """, unsafe_allow_html=True)
+        if st.button(f"اختيار هذا التخصص", key=spec['id'], use_container_width=True):
             st.session_state.selected_spec_id = spec['id']
             st.session_state.current_page = 'modules'
             st.rerun()
@@ -270,7 +432,12 @@ elif st.session_state.current_page == 'modules':
     curr_spec = next(s for s in curr_prog["specialties"] if s["id"] == st.session_state.selected_spec_id)
     st.subheader(f"📦 الوحدات التكوينية - {curr_spec['title']}")
     for mod in curr_spec["modules"]:
-        if st.button(f"📘 {mod['title']}", key=mod['id'], use_container_width=True):
+        st.markdown(f"""
+            <div class="card-box" style="border-right: 5px solid #7C3AED;">
+                <h4 style="color: #6D28D9;">📘 {mod['title']}</h4>
+            </div>
+        """, unsafe_allow_html=True)
+        if st.button(f"استعراض الوحدة", key=mod['id'], use_container_width=True):
             st.session_state.selected_mod_id = mod['id']
             st.session_state.current_page = 'subjects'
             st.rerun()
@@ -283,10 +450,15 @@ elif st.session_state.current_page == 'subjects':
     curr_prog = next(p for p in PLATFORM_DATA["programs"] if p["id"] == st.session_state.selected_prog_id)
     curr_spec = next(s for s in curr_prog["specialties"] if s["id"] == st.session_state.selected_spec_id)
     curr_mod = next(m for m in curr_spec["modules"] if m["id"] == st.session_state.selected_mod_id)
-    st.subheader(f"📐 المقاييس - {curr_mod['title']}")
+    st.subheader(f"📐 المقاييس البيداغوجية - {curr_mod['title']}")
     for subj in curr_mod["subjects"]:
-        st.write(f"**📑 مخطط المقياس:** {subj['syllabus']}")
-        if st.button(f"دخول {subj['title']}", key=subj['id'], use_container_width=True):
+        st.markdown(f"""
+            <div class="card-box">
+                <h4 style="color: #1E3A8A;">📑 {subj['title']}</h4>
+                <p style="color: #4B5563;"><b>مخطط المقياس:</b> {subj['syllabus']}</p>
+            </div>
+        """, unsafe_allow_html=True)
+        if st.button(f"دخول المقياس", key=subj['id'], use_container_width=True):
             st.session_state.selected_subj_id = subj['id']
             st.session_state.current_page = 'lessons'
             st.rerun()
@@ -301,6 +473,7 @@ elif st.session_state.current_page == 'lessons':
     curr_spec = next(s for s in curr_prog["specialties"] if s["id"] == st.session_state.selected_spec_id)
     curr_mod = next(m for m in curr_spec["modules"] if m["id"] == st.session_state.selected_mod_id)
     curr_subj = next(sb for sb in curr_mod["subjects"] if sb["id"] == st.session_state.selected_subj_id)
+    
     st.subheader(f"📖 الدروس والبطاقات التقنية - {curr_subj['title']}")
     les_options = {les['title']: les['id'] for les in curr_subj["lessons"]}
     selected_les_title = st.selectbox("اختر الدرس للعرض:", list(les_options.keys()))
@@ -309,20 +482,33 @@ elif st.session_state.current_page == 'lessons':
     curr_les = next(l for l in curr_subj["lessons"] if l["id"] == selected_les_id)
     st.divider()
     
-    st.markdown(f"### 📝 {curr_les['title']}")
+    st.markdown(f"""
+        <div class="card-box" style="background-color: #EFF6FF; border-right: 6px solid #2563EB;">
+            <h3 style="color: #1E40AF;">📝 {curr_les['title']}</h3>
+        </div>
+    """, unsafe_allow_html=True)
     
-    # قسم المتربص
+    # قسم المتربص في نافذة واضحة
     st.markdown("#### 👨‍🎓 قسم المتربص:")
-    st.write(f"**الشرح:** {curr_les['trainee_content']['description']}")
-    st.write(f"**الأنشطة التطبيقية:** {curr_les['trainee_content']['activities']}")
-    st.write(f"**التقييم الذاتي:** {curr_les['trainee_content']['quiz']}")
+    st.markdown(f"""
+        <div class="card-box">
+            <p><b>📌 الشرح:</b> {curr_les['trainee_content']['description']}</p>
+            <p><b>🛠️ الأنشطة التطبيقية:</b> {curr_les['trainee_content']['activities']}</p>
+            <p><b>❓ التقييم الذاتي:</b> {curr_les['trainee_content']['quiz']}</p>
+        </div>
+    """, unsafe_allow_html=True)
     
     st.divider()
     
-    # حاسبة المقادير والبطاقة التقنية الخاصة بالدرس
+    # حاسبة المقادير والبطاقة التقنية
     st.markdown("#### 🧮 البطاقة التقنية وحاسبة المقادير التفاعلية:")
     t_card = curr_les['teacher_content']['technical_card']
-    st.info(f"📌 **{t_card['title']}**")
+    
+    st.markdown(f"""
+        <div class="card-box" style="background-color: #F0FDF4; border-right: 6px solid #10B981;">
+            <h4 style="color: #047857;">📌 {t_card['title']}</h4>
+        </div>
+    """, unsafe_allow_html=True)
     
     base_p = t_card['base_portions']
     target_p = st.number_input("حدد عدد القطع المطلوب تحضيرها:", min_value=1, value=base_p, key=f"calc_{curr_les['id']}")
@@ -337,9 +523,13 @@ elif st.session_state.current_page == 'lessons':
     if st.session_state.user_role == 'teacher':
         st.markdown("---")
         st.markdown("#### 👨‍🏫 قسم الأستاذ (خاص ومحمي):")
-        st.write(f"**مخطط الدرس (APC):** {curr_les['teacher_content']['apc_plan']}")
-        st.write(f"**الأهداف التعليمية:** {curr_les['teacher_content']['objectives']}")
-        st.write(f"**شبكة التقييم والمعايير:** {curr_les['teacher_content']['evaluation_grid']}")
-        st.write(f"**الإجابات النموذجية:** {curr_les['teacher_content']['model_answers']}")
+        st.markdown(f"""
+            <div class="card-box" style="background-color: #FEF2F2; border-right: 6px solid #DC2626;">
+                <p><b>📐 مخطط الدرس (APC):</b> {curr_les['teacher_content']['apc_plan']}</p>
+                <p><b>🎯 الأهداف التعليمية:</b> {curr_les['teacher_content']['objectives']}</p>
+                <p><b>📊 شبكة التقييم والمعايير:</b> {curr_les['teacher_content']['evaluation_grid']}</p>
+                <p><b>💡 الإجابات النموذجية:</b> {curr_les['teacher_content']['model_answers']}</p>
+            </div>
+        """, unsafe_allow_html=True)
     else:
         st.warning("🔒 محتوى التوجيه البيداغوجي الخاص بالأستاذ محجوب في وضع معاينة المتربص.")
