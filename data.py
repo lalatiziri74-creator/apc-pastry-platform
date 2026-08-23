@@ -1,172 +1,141 @@
-# data.py
-# بنية البيانات الهيكلية المنظمة للمنصة البيداغوجية للتكوين المهني (APC)
-# إعداد وتصميم بيداغوجي: الأستاذة فرحي حورية
-# الهيكل الهرمي: برنامج -> تخصص -> وحدة -> مقياس -> درس -> (محتوى متربص / محتوى أستاذ)
-
-PLATFORM_DATA = {
+جPLATFORM_DATA = {
     "programs": [
         {
-            "id": "prog_apprentice",
-            "title": "📖 برنامج التمهين",
-            "description": "نظام التكوين عن طريق التمهين بالمؤسسات المستقبلة.",
-            "visibility": "public",  # public, hidden, draft
+            "id": "prog_woman_home",
+            "title": "برنامج المرأة الماكثة بالبيت",
+            "description": "التكوين التأهيلي الموجه للمرأة الماكثة بالبيت لتطوير حرف الإنتاج المصغر.",
             "specialties": [
                 {
-                    "id": "spec_app_pastry",
-                    "title": "صناعة الحلويات / Pâtisserie",
-                    "code": "PAT_APP_01",
-                    "visibility": "public",
-                    "modules": [
-                        {
-                            "id": "mod_app_01",
-                            "title": "الوحدة 01: الأساسيات والمواد الأولية",
-                            "code": "MOD_01",
-                            "visibility": "public",
-                            "subjects": [
-                                {
-                                    "id": "subj_app_01",
-                                    "title": "مقياس التقنيات التطبيقية والمواد",
-                                    "syllabus": "مخطط المقياس التجريبي: التعرف على خامات الحلويات، المعايير الكيميائية والفيزيائية للمكونات، وضوابط السلامة.",
-                                    "visibility": "public",
-                                    "lessons": [
-                                        {
-                                            "id": "les_app_01_01",
-                                            "title": "الدرس 01: المكونات الأساسية ودورها في العجائن",
-                                            "access": "free",  # free, premium, restricted
-                                            "is_premium": False,
-                                            "visibility": "public",
-                                            "trainee_content": {
-                                                "description": "شرح تجريبي للمكونات الأساسية وتأثيرها على قوام العجين.",
-                                                "activities": "تمرين تطبيقي تجريبي: حساب نسب المكونات في وصفة معيارية.",
-                                                "quiz": "سؤال تقييمي تجريبي حول دور المواد الدسمة."
-                                            },
-                                            "teacher_content": {
-                                                "apc_plan": "مخطط الدرس وفق المقاربة بالكفاءات (APC) - نموذج تجريبي.",
-                                                "objectives": "الأهداف التعليمية والكفاءات المستهدفة للدرس.",
-                                                "evaluation_grid": "شبكة معايير ومؤشرات التقييم النموذجية.",
-                                                "model_answers": "التصحيح والإجابة النموذجية للتطبيقات.",
-                                                "technical_card": "البطاقة التقنية البيداغوجية للدرس."
-                                            }
-                                        },
-                                        {
-                                            "id": "les_app_01_02",
-                                            "title": "الدرس 02: التقنيات الاحترافية في إدارة الحرارة والطهي",
-                                            "access": "premium",
-                                            "is_premium": True,
-                                            "visibility": "public",
-                                            "trainee_content": {
-                                                "description": "شرح تجريبي لضبط حرارة الأفران وحساب أوقات الطهي.",
-                                                "activities": "نشاط عملي تجريبي: ضبط مخطط الطهي.",
-                                                "quiz": "اختبار تقييمي تجريبي حول أخطاء الطهي."
-                                            },
-                                            "teacher_content": {
-                                                "apc_plan": "مخطط الدرس APC التجريبي المخصص للأستاذ.",
-                                                "objectives": "الكفاءات الخاصة بإدارة الأفران والورشة.",
-                                                "evaluation_grid": "معايير تقييم نضج واستواء المنتج النهائي.",
-                                                "model_answers": "الإجابات النموذجية الخاصة باختبار الأخطاء.",
-                                                "technical_card": "بطاقة السلامة والتحكم في المعدات."
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "id": "prog_presence",
-            "title": "🏫 التكوين الحضوري",
-            "description": "التكوين المهني الأساسي الحضوري بالداخلية ونصف الداخلية.",
-            "visibility": "public",
-            "specialties": [
-                {
-                    "id": "spec_pres_pastry",
-                    "title": "صناعة الحلويات / Pâtisserie",
-                    "code": "PAT_PRES_01",
-                    "visibility": "public",
-                    "modules": [
-                        {
-                            "id": "mod_pres_01",
-                            "title": "الوحدة 01: أساسيات الورشة الحضورية",
-                            "code": "MOD_PRES_01",
-                            "visibility": "public",
-                            "subjects": [
-                                {
-                                    "id": "subj_pres_01",
-                                    "title": "مقياس النظافة والتطبيق الحضوري",
-                                    "syllabus": "مخطط المقياس التجريبي للتكوين الحضوري.",
-                                    "visibility": "public",
-                                    "lessons": [
-                                        {
-                                            "id": "les_pres_01_01",
-                                            "title": "الدرس 01: قواعد السلامة والنظافة في ورشة الحلويات",
-                                            "access": "free",
-                                            "is_premium": False,
-                                            "visibility": "public",
-                                            "trainee_content": {
-                                                "description": "مقدمة تجريبية عن النظافة الشخصية ونظافة المعدات.",
-                                                "activities": "نشاط تطبيقي تجريبي لتعقيم أدوات الورشة.",
-                                                "quiz": "أسئلة مراجعة حول شروط السلامة."
-                                            },
-                                            "teacher_content": {
-                                                "apc_plan": "مخطط الدرس الحضوري وفق المقاربة بالكفاءات.",
-                                                "objectives": "تطبيق شروط الوقاية والأمن الداخلي.",
-                                                "evaluation_grid": "شبكة ملاحظة السلوك والتطبيق العملي.",
-                                                "model_answers": "حلول أسئلة المراجعة.",
-                                                "technical_card": "بطاقة المعايير الصحية للورشات."
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "id": "prog_housewife",
-            "title": "🏠 المرأة الماكثة بالبيت",
-            "description": "برامج التكوين التأهيلي الموجهة للمرأة الماكثة بالبيت.",
-            "visibility": "public",
-            "specialties": [
-                {
-                    "id": "spec_hw_traditional",
-                    "title": "الحلويات التقليدية المنزلية",
+                    "id": "spec_trad",
+                    "title": "تخصص الحلويات التقليدية المنزلية",
                     "code": "PAT_HW_01",
-                    "visibility": "public",
                     "modules": [
                         {
-                            "id": "mod_hw_01",
-                            "title": "الوحدة 01: تحضير العجائن التقليدية الأساسية",
-                            "code": "MOD_HW_01",
-                            "visibility": "public",
+                            "id": "mod_trad_1",
+                            "title": "وحدة تقنيات صناعة الحلويات التقليدية",
                             "subjects": [
                                 {
-                                    "id": "subj_hw_01",
-                                    "title": "مقياس الحلويات التقليدية التأهيلية",
-                                    "syllabus": "مخطط المقياس التجريبي للمرأة الماكثة بالبيت.",
-                                    "visibility": "public",
+                                    "id": "subj_trad_1",
+                                    "title": "مقياس العجائن والمعسلات التقليدية",
+                                    "syllabus": "مخطط المقياس: دراسة عجائن المقيض والدزريات والمعسلات.",
                                     "lessons": [
                                         {
-                                            "id": "les_hw_01_01",
-                                            "title": "الدرس 01: تقنيات بس العجين والتحكم في القوام",
-                                            "access": "free",
+                                            "id": "les_dziriette",
+                                            "title": "درس تحضير الدزريات الأصلية",
                                             "is_premium": False,
-                                            "visibility": "public",
                                             "trainee_content": {
-                                                "description": "شرح تجريبي لأساسيات تحضير العجائن التقليدية.",
-                                                "activities": "تطبيق تجريبي منزلي.",
-                                                "quiz": "أسئلة مراجعة المكونات."
+                                                "description": "تعلم كيفية تحضير العينة، التشكيل، والعسل الخاص بالدزريات.",
+                                                "activities": "تطبيق عملية تزيين ووزن العجين والحشو.",
+                                                "quiz": "ماهي درجات العسل المناسبة لسقي الدزريات؟"
                                             },
                                             "teacher_content": {
-                                                "apc_plan": "مخطط التكوين التأهيلي الخفيف.",
-                                                "objectives": "إتقان القوام التقليدي للحلويات.",
-                                                "evaluation_grid": "شبكة تقييم المنتج المنزلي.",
-                                                "model_answers": "الإجابات النموذجية.",
-                                                "technical_card": "بطاقة المقادير المعيارية للإنتاج المنزلي."
+                                                "apc_plan": "مخطط درس وفق المقاربة بالكفاءات (APC).",
+                                                "objectives": "أن تتمكن المتربصة من إتقان قالب الدزريات بنسبة نجاح تامة.",
+                                                "evaluation_grid": "شبكة التقييم: اللون، اللمعان، وطراوة الحشو.",
+                                                "model_answers": "الإجابة النموذجية وطريقة تفادي جفاف الحشو.",
+                                                "technical_card": {
+                                                    "title": "البطاقة التقنية: الدزريات",
+                                                    "base_portions": 20,
+                                                    "ingredients": [
+                                                        {"item": "فرينة (طحين)", "qty": 500, "unit": "غرام"},
+                                                        {"item": "سمن معطر", "qty": 125, "unit": "غرام"},
+                                                        {"item": "لوز مطحون (الحشو)", "qty": 300, "unit": "غرام"},
+                                                        {"item": "سكر عادي", "qty": 100, "unit": "غرام"},
+                                                        {"item": "عسل", "qty": 250, "unit": "غرام"}
+                                                    ]
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "spec_oriental",
+                    "title": "تخصص الحلويات الشرقية والمعاصرة",
+                    "code": "PAT_HW_02",
+                    "modules": [
+                        {
+                            "id": "mod_oriental_1",
+                            "title": "وحدة الحلويات الشرقية",
+                            "subjects": [
+                                {
+                                    "id": "subj_oriental_1",
+                                    "title": "مقياس المعجنات الشرقية الدقيقة",
+                                    "syllabus": "مخطط المقياس: تقنيات الطهي والتشكيل الشرقي.",
+                                    "lessons": [
+                                        {
+                                            "id": "les_baklawa",
+                                            "title": "درس البقلاوة الجزائرية التقليدية",
+                                            "is_premium": False,
+                                            "trainee_content": {
+                                                "description": "حساب الطبقات، تورق العجين، وتوزيع الحشو.",
+                                                "activities": "ترتيب 7 طبقات سفلية و 7 علوية.",
+                                                "quiz": "كيف يتم تجنب انتفاخ طبقات البقلاوة أثناء الخبز؟"
+                                            },
+                                            "teacher_content": {
+                                                "apc_plan": "مخطط بيداغوجي لدرس البقلاوة.",
+                                                "objectives": "التحكم في تقطيع ووزن الصينية.",
+                                                "evaluation_grid": "التناسق، القرمشة، وتشرب العسل.",
+                                                "model_answers": "الحل النموذجي لالتصاق الطبقات.",
+                                                "technical_card": {
+                                                    "title": "البطاقة التقنية: البقلاوة الصينية القياسية",
+                                                    "base_portions": 30,
+                                                    "ingredients": [
+                                                        {"item": "فرينة", "qty": 1000, "unit": "غرام"},
+                                                        {"item": "سمن ابلح", "qty": 300, "unit": "غرام"},
+                                                        {"item": "لوز مرحي", "qty": 3000, "unit": "غرام"},
+                                                        {"item": "سكر", "qty": 1000, "unit": "غرام"}
+                                                    ]
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "spec_western",
+                    "title": "تخصص الحلويات الغربية (Patisserie Fine)",
+                    "code": "PAT_HW_03",
+                    "modules": [
+                        {
+                            "id": "mod_western_1",
+                            "title": "وحدة الترتلات والكريمة",
+                            "subjects": [
+                                {
+                                    "id": "subj_western_1",
+                                    "title": "مقياس العجائن الهشة والفاخرة",
+                                    "syllabus": "مخطط المقياس: Pâte Sablée et Crèmes.",
+                                    "lessons": [
+                                        {
+                                            "id": "les_tarts",
+                                            "title": "درس تارتليت الفواكه الموسمية",
+                                            "is_premium": False,
+                                            "trainee_content": {
+                                                "description": "إعداد العجينة الهشة، الخبز الأعمى، وترتيب الفواكه.",
+                                                "activities": "تلبيس القوالب الصغرى بدقة.",
+                                                "quiz": "لماذا نقوم بثقب العجينة الهشة قبل الخبز؟"
+                                            },
+                                            "teacher_content": {
+                                                "apc_plan": "مخطط بيداغوجي لدرس الترتليت.",
+                                                "objectives": "إتقان الطهي المتساوي لقواعد العجين.",
+                                                "evaluation_grid": "لون الحواف، ثبات الكريمة، واللمعان.",
+                                                "model_answers": "التعامل مع انكماش العجينة في الفرن.",
+                                                "technical_card": {
+                                                    "title": "البطاقة التقنية: تارتليت الفواكه",
+                                                    "base_portions": 10,
+                                                    "ingredients": [
+                                                        {"item": "فرينة", "qty": 250, "unit": "غرام"},
+                                                        {"item": "زبدة باردة", "qty": 125, "unit": "غرام"},
+                                                        {"item": "سكر رطب", "qty": 75, "unit": "غرام"},
+                                                        {"item": "بيضة", "qty": 1, "unit": "حبة"}
+                                                    ]
+                                                }
                                             }
                                         }
                                     ]
@@ -176,6 +145,12 @@ PLATFORM_DATA = {
                     ]
                 }
             ]
+        },
+        {
+            "id": "prog_cap",
+            "title": "شهادة الكفاءة المهنية (CAP)",
+            "description": "برنامج التكوين المهني الأساسي.",
+            "specialties": []
         }
     ]
 }
