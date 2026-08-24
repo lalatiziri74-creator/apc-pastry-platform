@@ -1,1744 +1,652 @@
-import streamlit as st
-import json
-import os
-import uuid
-from datetime import datetime
-
-# =========================================================
-# 1. إعداد المنصة
-# =========================================================
-
-st.set_page_config(
-    page_title="المنصة البيداغوجية للتكوين المهني - فرحي حورية",
-    page_icon="🥐",
-    layout="wide",
-    initial_sidebar_state="collapsed"
-)
-
-DATA_FILE = "platform_data.json"
-UPLOADS_DIR = "uploaded_files"
-
-os.makedirs(UPLOADS_DIR, exist_ok=True)
-
-
-# =========================================================
-# 2. البيانات الافتراضية
-# =========================================================
-
-def uid(prefix):
-    return f"{prefix}_{uuid.uuid4().hex[:8]}"
-
-
-def default_lesson(name, description=""):
-    return {
-        "id": uid("lesson"),
-        "name": name,
-        "content": description,
-        "objectives": "",
-        "competencies": "",
-        "pedagogy": "",
-        "steps": "",
-        "evaluation": "",
-        "technical_sheets": [],
-        "recipes": []
-    }
-
-
-def default_unit(name, lessons=None):
-    return {
-        "id": uid("unit"),
-        "name": name,
-        "description": "",
-        "lessons": lessons or []
-    }
-
-
-def default_window(name, description="", units=None):
-    return {
-        "id": uid("window"),
-        "name": name,
-        "description": description,
-        "units": units or []
-    }
-
-
-def default_program(program_id, name, description, windows):
-    return {
-        "id": program_id,
-        "name": name,
-        "description": description,
-        "windows": windows
-    }
-
-
-DEFAULT_DATA = {
-
-    "settings": {
-        "platform_name": "المنصة البيداغوجية للتكوين المهني (APC)",
-        "supervisor_name": "إشراف الأستاذة: فرحي حورية",
-        "admin_password": "admin"
-    },
-
-    "programs": [
-
-        # =================================================
-        # البرنامج الأول: التمهين
-        # =================================================
-
-        default_program(
-            "apprenticeship",
-            "📖 برنامج التكوين بالتمهين",
-            "التكوين عن طريق التمهين داخل المؤسسات والورشات المهنية.",
-            [
-
-                default_window(
-                    "🏢 التكوين النظري",
-                    "المعارف النظرية والمهنية الأساسية.",
-                    [
-                        default_unit(
-                            "المعارف المهنية الأساسية",
-                            [
-                                default_lesson(
-                                    "التعريف بالمهنة ومحيط العمل"
-                                ),
-                                default_lesson(
-                                    "الأمن والسلامة المهنية"
-                                ),
-                                default_lesson(
-                                    "النظافة المهنية"
-                                )
-                            ]
-                        )
-                    ]
-                ),
-
-                default_window(
-                    "👩‍🍳 التكوين التطبيقي",
-                    "التطبيق العملي للمهارات المهنية.",
-                    [
-                        default_unit(
-                            "تقنيات صناعة الحلويات",
-                            [
-                                default_lesson(
-                                    "تحضير العجائن الأساسية"
-                                ),
-                                default_lesson(
-                                    "تحضير الكريمات"
-                                ),
-                                default_lesson(
-                                    "تقنيات التزيين"
-                                )
-                            ]
-                        )
-                    ]
-                ),
-
-                default_window(
-                    "🏭 التكوين داخل المؤسسة المستقبلة",
-                    "تطبيق الكفاءات داخل المحيط المهني الحقيقي.",
-                    [
-                        default_unit(
-                            "الممارسة المهنية",
-                            [
-                                default_lesson(
-                                    "تنظيم العمل داخل الورشة"
-                                ),
-                                default_lesson(
-                                    "استعمال التجهيزات المهنية"
-                                ),
-                                default_lesson(
-                                    "احترام قواعد الجودة"
-                                )
-                            ]
-                        )
-                    ]
-                )
-            ]
-        ),
-
-        # =================================================
-        # البرنامج الثاني: الحضوري
-        # =================================================
-
-        default_program(
-            "presential",
-            "🏫 برنامج التكوين الحضوري",
-            "برنامج التكوين الحضوري داخل مؤسسة التكوين المهني.",
-            [
-
-                default_window(
-                    "📚 الجانب النظري",
-                    "المعارف والمفاهيم النظرية.",
-                    [
-                        default_unit(
-                            "المواد الأولية",
-                            [
-                                default_lesson(
-                                    "الدقيق والسكريات والمواد الدسمة"
-                                ),
-                                default_lesson(
-                                    "البيض والمواد المضافة"
-                                )
-                            ]
-                        )
-                    ]
-                ),
-
-                default_window(
-                    "👩‍🍳 الجانب التطبيقي",
-                    "تطبيق التقنيات المهنية داخل الورشة.",
-                    [
-                        default_unit(
-                            "العجائن",
-                            [
-                                default_lesson(
-                                    "العجائن الأساسية"
-                                ),
-                                default_lesson(
-                                    "العجائن المورقة"
-                                ),
-                                default_lesson(
-                                    "عجينة الشو"
-                                )
-                            ]
-                        ),
-                        default_unit(
-                            "الكريمات والحشوات",
-                            [
-                                default_lesson(
-                                    "الكريمة الأساسية"
-                                ),
-                                default_lesson(
-                                    "الغاناش"
-                                ),
-                                default_lesson(
-                                    "الموس"
-                                )
-                            ]
-                        )
-                    ]
-                ),
-
-                default_window(
-                    "📝 التقييم والامتحانات",
-                    "التقييم المستمر والاختبارات المهنية.",
-                    [
-                        default_unit(
-                            "التقييم",
-                            [
-                                default_lesson(
-                                    "التقييم النظري"
-                                ),
-                                default_lesson(
-                                    "التقييم التطبيقي"
-                                )
-                            ]
-                        )
-                    ]
-                )
-            ]
-        ),
-
-        # =================================================
-        # البرنامج الثالث: المرأة الماكثة بالبيت
-        # =================================================
-
-        default_program(
-            "home_women",
-            "👩‍🍳 برنامج المرأة الماكثة بالبيت",
-            "برنامج تأهيلي مهني في فنون الطبخ وصناعة الحلويات.",
-            [
-
-                default_window(
-                    "🍰 الحلويات التقليدية الجزائرية",
-                    "التعرف على تقنيات الحلويات الجزائرية الأصيلة.",
-                    [
-                        default_unit(
-                            "حلويات تقليدية",
-                            [
-                                default_lesson(
-                                    "المقروط"
-                                ),
-                                default_lesson(
-                                    "كعب الغزال"
-                                ),
-                                default_lesson(
-                                    "البقلاوة الجزائرية"
-                                ),
-                                default_lesson(
-                                    "قلب اللوز"
-                                )
-                            ]
-                        )
-                    ]
-                ),
-
-                default_window(
-                    "🧁 الحلويات الغربية",
-                    "تقنيات الباتيسري الحديثة.",
-                    [
-                        default_unit(
-                            "الحلويات الغربية",
-                            [
-                                default_lesson(
-                                    "الكيك"
-                                ),
-                                default_lesson(
-                                    "التارت"
-                                ),
-                                default_lesson(
-                                    "التشيز كيك"
-                                )
-                            ]
-                        )
-                    ]
-                ),
-
-                default_window(
-                    "🍫 الحلويات الشرقية والشوكولاتة",
-                    "تقنيات الحلويات الشرقية والشوكولاتة.",
-                    [
-                        default_unit(
-                            "الحلويات الشرقية",
-                            [
-                                default_lesson(
-                                    "الكنافة"
-                                ),
-                                default_lesson(
-                                    "القطايف"
-                                )
-                            ]
-                        ),
-                        default_unit(
-                            "الشوكولاتة",
-                            [
-                                default_lesson(
-                                    "أساسيات الشوكولاتة"
-                                ),
-                                default_lesson(
-                                    "تقنيات التزيين بالشوكولاتة"
-                                )
-                            ]
-                        )
-                    ]
-                )
-            ]
-        )
-    ],
-
-    "exams": [],
-    "results": [],
-    "documents": []
-}
-
-
-# =========================================================
-# 3. الحفظ والتحميل
-# =========================================================
-
-def save_data(data):
-    try:
-        with open(DATA_FILE, "w", encoding="utf-8") as f:
-            json.dump(
-                data,
-                f,
-                ensure_ascii=False,
-                indent=4
-            )
-        return True
-    except Exception as e:
-        st.error(f"حدث خطأ أثناء الحفظ: {e}")
-        return False
-
-
-def load_data():
-
-    if not os.path.exists(DATA_FILE):
-        save_data(DEFAULT_DATA)
-        return DEFAULT_DATA
-
-    try:
-        with open(DATA_FILE, "r", encoding="utf-8") as f:
-            data = json.load(f)
-
-        # توافق مع البيانات القديمة
-        if "settings" not in data:
-            data["settings"] = DEFAULT_DATA["settings"]
-
-        if "programs" not in data:
-            data["programs"] = DEFAULT_DATA["programs"]
-
-        if "exams" not in data:
-            data["exams"] = []
-
-        if "results" not in data:
-            data["results"] = []
-
-        if "documents" not in data:
-            data["documents"] = []
-
-        return data
-
-    except Exception:
-        st.warning("تعذر قراءة ملف البيانات، سيتم إنشاء بيانات جديدة.")
-        save_data(DEFAULT_DATA)
-        return DEFAULT_DATA
-
-
-if "db" not in st.session_state:
-    st.session_state.db = load_data()
-
-db = st.session_state.db
-
-
-# =========================================================
-# 4. حالة التطبيق
-# =========================================================
-
-if "page" not in st.session_state:
-    st.session_state.page = "home"
-
-if "admin" not in st.session_state:
-    st.session_state.admin = False
-
-if "program_id" not in st.session_state:
-    st.session_state.program_id = None
-
-if "window_id" not in st.session_state:
-    st.session_state.window_id = None
-
-if "unit_id" not in st.session_state:
-    st.session_state.unit_id = None
-
-if "lesson_id" not in st.session_state:
-    st.session_state.lesson_id = None
-
-if "exam_id" not in st.session_state:
-    st.session_state.exam_id = None
-
-
-# =========================================================
-# 5. التصميم
-# =========================================================
-
-st.markdown("""
-<style>
-
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap');
-
-html, body, [class*="css"] {
-    font-family: 'Cairo', sans-serif;
-}
-
-.main-title {
-    text-align: center;
-    font-size: 30px;
-    font-weight: 800;
-    margin-bottom: 5px;
-}
-
-.supervisor {
-    text-align: center;
-    padding: 10px;
-    border-radius: 10px;
-    background: #f1f5f9;
-    margin-bottom: 20px;
-    font-weight: bold;
-}
-
-.card {
-    padding: 20px;
-    border-radius: 15px;
-    border: 1px solid #e2e8f0;
-    margin-bottom: 15px;
-    background: white;
-}
-
-.window-card {
-    padding: 22px;
-    border-radius: 15px;
-    border: 1px solid #cbd5e1;
-    margin-bottom: 15px;
-}
-
-</style>
-""", unsafe_allow_html=True)
-
-
-# =========================================================
-# 6. الرأس
-# =========================================================
-
-settings = db["settings"]
-
-st.markdown(
-    f"<div class='main-title'>🥐 {settings['platform_name']}</div>",
-    unsafe_allow_html=True
-)
-
-st.markdown(
-    f"<div class='supervisor'>✨ {settings['supervisor_name']}</div>",
-    unsafe_allow_html=True
-)
-
-nav1, nav2, nav3, nav4, nav5 = st.columns(5)
-
-with nav1:
-    if st.button("🏠 الرئيسية", use_container_width=True):
-        st.session_state.page = "home"
-        st.rerun()
-
-with nav2:
-    if st.button("🔍 البحث", use_container_width=True):
-        st.session_state.page = "search"
-        st.rerun()
-
-with nav3:
-    if st.button("📝 الامتحانات", use_container_width=True):
-        st.session_state.page = "exams"
-        st.rerun()
-
-with nav4:
-    if st.button("📊 النتائج", use_container_width=True):
-        st.session_state.page = "results"
-        st.rerun()
-
-with nav5:
-    if st.session_state.admin:
-        if st.button("⚙️ الإدارة", use_container_width=True):
-            st.session_state.page = "admin"
-            st.rerun()
-    else:
-        if st.button("🔐 دخول الإدارة", use_container_width=True):
-            st.session_state.page = "login"
-            st.rerun()
-
-st.divider()
-
-
-# =========================================================
-# 7. الرئيسية
-# =========================================================
-
-if st.session_state.page == "home":
-
-    st.header("🌟 برامج التكوين المهني")
-
-    st.write(
-        "اختاري البرنامج المناسب للوصول إلى النوافذ والوحدات والدروس والبطاقات التقنية والوصفات."
-    )
-
-    for program in db["programs"]:
-
-        st.markdown(
-            f"""
-            <div class="card">
-                <h3>{program['name']}</h3>
-                <p>{program['description']}</p>
-                <b>عدد النوافذ: {len(program.get('windows', []))}</b>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الشيف البيداغوجي – النسخة المتقدمة</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Tajawal', 'Segoe UI', system-ui, sans-serif; background: #faf8f5; }
+        .shadow-soft { box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+        .program-card { border: 1px solid #e5e7eb; border-radius: 16px; padding: 1.5rem; background: white; cursor: pointer; transition: all 0.3s ease; }
+        .program-card:hover { box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
+        .page-section { display: none; }
+        .page-section.active { display: block; }
+        .badge-pending { background: #fef3c7; color: #92400e; font-size: 0.65rem; padding: 0.15rem 0.5rem; border-radius: 999px; }
+        .badge-reviewed { background: #d1fae5; color: #065f46; font-size: 0.65rem; padding: 0.15rem 0.5rem; border-radius: 999px; }
+        .badge-draft { background: #e5e7eb; color: #4b5563; font-size: 0.65rem; padding: 0.15rem 0.5rem; border-radius: 999px; }
+        .module-card { border-right: 4px solid #b8860b; background: white; border-radius: 12px; padding: 1rem; margin-bottom: 1rem; }
+        .card-item { border: 1px solid #e5e7eb; border-radius: 8px; padding: 0.75rem; margin-top: 0.5rem; background: #fefcf9; cursor: pointer; }
+        .card-item:hover { background: #fdf6ed; }
+        .btn-admin { padding: 0.3rem 0.8rem; border-radius: 6px; font-size: 0.8rem; border: none; cursor: pointer; transition: 0.2s; background: #f3f4f6; }
+        .btn-admin:hover { opacity: 0.8; }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 999; }
+        .modal-overlay.active { display: flex; }
+        .modal-box { background: white; border-radius: 20px; padding: 2rem; max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto; }
+        .accordion-content { padding: 0.5rem 0 1rem; }
+        .accordion-btn { background: #f9f7f4; border: 1px solid #e5e7eb; border-radius: 8px; padding: 0.6rem 1rem; width: 100%; text-align: right; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s ease; cursor: pointer; }
+        .accordion-btn:hover { background: #f3f0ea; }
+        .accordion-btn .arrow { transition: transform 0.2s ease; }
+        .accordion-btn .arrow.open { transform: rotate(180deg); }
+        .eval-grid td, .eval-grid th { text-align: center; vertical-align: middle; font-size: 0.85rem; padding: 0.25rem 0.2rem; }
+        .video-placeholder { background: #f1f3f5; border: 1px dashed #ced4da; border-radius: 6px; padding: 0.4rem 0.8rem; text-align: center; color: #6c757d; font-size: 0.85rem; }
+        .ingredient-list { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+        .ingredient-item { background: #f9f7f4; padding: 0.2rem 0.6rem; border-radius: 6px; border: 1px solid #e5e7eb; }
+        @media print { .no-print { display: none !important; } .accordion-content { display: block !important; } .accordion-btn { border: none; background: none; } .accordion-btn .arrow { display: none; } }
+    </style>
+</head>
+<body>
+
+<nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50 no-print">
+    <div class="max-w-7xl mx-auto px-4 flex justify-between items-center h-16">
+        <span class="font-bold text-lg text-gray-800">🍰 الشيف البيداغوجي</span>
+        <div>
+            <button onclick="navigateTo('home')" class="text-sm text-gray-600 hover:text-amber-700 px-2">🏠 الرئيسية</button>
+            <button onclick="navigateTo('admin')" class="text-sm text-gray-600 hover:text-amber-700 px-2">⚙️ إدارة</button>
+        </div>
+    </div>
+</nav>
+
+<header class="bg-gradient-to-l from-amber-50 to-white border-b border-amber-100 py-6 text-center">
+    <h1 class="text-2xl sm:text-3xl font-bold text-gray-800">🍰 منصة <span class="text-amber-700">الشيف البيداغوجي</span></h1>
+    <p class="text-gray-600 mt-1 text-sm">منصة تكوين مهني جزائرية في صناعة الحلويات التقليدية</p>
+    <p class="text-xs text-gray-500 mt-2">إعداد الأستاذة: <strong class="text-amber-800">حورية فرحي</strong> © 2026</p>
+</header>
+
+<main class="max-w-7xl mx-auto px-4 py-6">
+
+    <section id="page-home" class="page-section active">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6">📚 برامج التكوين</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="programList"></div>
+    </section>
+
+    <section id="page-program" class="page-section">
+        <button onclick="navigateTo('home')" class="text-sm text-amber-700 hover:text-amber-900 no-print">← العودة</button>
+        <div id="programDetailContainer" class="mt-4"></div>
+        <button onclick="window.print()" class="mt-4 bg-amber-700 text-white px-4 py-2 rounded-lg no-print">🖨️ طباعة</button>
+    </section>
+
+    <section id="page-admin" class="page-section">
+        <button onclick="navigateTo('home')" class="text-sm text-amber-700 hover:text-amber-900 no-print">← العودة</button>
+        <div class="bg-white rounded-xl shadow-soft border border-gray-100 p-6 mt-4">
+            <h3 class="text-xl font-bold text-gray-800">🔐 إدارة المنصة</h3>
+            <p class="text-sm text-gray-500 mb-4">إضافة وتعديل وحذف البرامج والوحدات والبطاقات. التغييرات تحفظ تلقائياً.</p>
+            <div class="flex flex-wrap gap-3 mb-4">
+                <button onclick="openModal('program')" class="btn-admin bg-green-100 text-green-700 px-3 py-1 rounded">➕ برنامج جديد</button>
+                <button onclick="openModal('unit')" class="btn-admin bg-blue-100 text-blue-700 px-3 py-1 rounded">➕ وحدة جديدة</button>
+                <button onclick="openModal('card')" class="btn-admin bg-purple-100 text-purple-700 px-3 py-1 rounded">➕ بطاقة جديدة</button>
+                <button onclick="resetAllData()" class="btn-admin bg-red-100 text-red-700 px-3 py-1 rounded">🗑️ حذف الكل</button>
             </div>
-            """,
-            unsafe_allow_html=True
-        )
+            <pre id="adminOutput" class="mt-4 text-xs bg-gray-100 p-2 rounded max-h-60 overflow-auto"></pre>
+        </div>
+    </section>
 
-        if st.button(
-            f"فتح البرنامج ← {program['name']}",
-            key=f"program_{program['id']}",
-            use_container_width=True
-        ):
+</main>
 
-            st.session_state.program_id = program["id"]
-            st.session_state.page = "program"
-            st.rerun()
-
-
-# =========================================================
-# 8. البرنامج
-# =========================================================
-
-elif st.session_state.page == "program":
-
-    program = next(
-        (
-            p for p in db["programs"]
-            if p["id"] == st.session_state.program_id
-        ),
-        None
-    )
-
-    if not program:
-        st.error("البرنامج غير موجود.")
-        st.stop()
-
-    st.header(program["name"])
-    st.write(program["description"])
-
-    if st.button("← العودة إلى البرامج"):
-        st.session_state.page = "home"
-        st.rerun()
-
-    st.divider()
-
-    st.subheader("🪟 النوافذ الرئيسية للبرنامج")
-
-    windows = program.get("windows", [])
-
-    if not windows:
-        st.info("لا توجد نوافذ لهذا البرنامج.")
-    else:
-
-        for window in windows:
-
-            st.markdown(
-                f"""
-                <div class="window-card">
-                    <h3>{window['name']}</h3>
-                    <p>{window.get('description', '')}</p>
-                    <b>عدد الوحدات: {len(window.get('units', []))}</b>
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
-
-            if st.button(
-                f"فتح النافذة: {window['name']}",
-                key=f"window_{window['id']}",
-                use_container_width=True
-            ):
-
-                st.session_state.window_id = window["id"]
-                st.session_state.page = "window"
-                st.rerun()
-
-
-# =========================================================
-# 9. النافذة
-# =========================================================
-
-elif st.session_state.page == "window":
-
-    program = next(
-        (
-            p for p in db["programs"]
-            if p["id"] == st.session_state.program_id
-        ),
-        None
-    )
-
-    window = None
-
-    if program:
-        window = next(
-            (
-                w for w in program.get("windows", [])
-                if w["id"] == st.session_state.window_id
-            ),
-            None
-        )
-
-    if not window:
-        st.error("النافذة غير موجودة.")
-        st.stop()
-
-    st.header(window["name"])
-    st.write(window.get("description", ""))
-
-    if st.button("← العودة إلى البرنامج"):
-        st.session_state.page = "program"
-        st.rerun()
-
-    st.divider()
-
-    st.subheader("📚 الوحدات")
-
-    for unit in window.get("units", []):
-
-        st.markdown(
-            f"""
-            <div class="card">
-                <h3>📂 {unit['name']}</h3>
-                <p>{unit.get('description', '')}</p>
-                <b>عدد الدروس: {len(unit.get('lessons', []))}</b>
+<div id="modalOverlay" class="modal-overlay" onclick="if(event.target===this) closeModal()">
+    <div class="modal-box">
+        <h4 id="modalTitle" class="text-xl font-bold text-gray-800 mb-4">إضافة جديد</h4>
+        <form id="modalForm" onsubmit="saveModalItem(event)">
+            <div id="modalFields"></div>
+            <div class="flex gap-3 mt-6">
+                <button type="submit" class="bg-amber-700 text-white px-4 py-2 rounded-lg hover:bg-amber-800 transition">حفظ</button>
+                <button type="button" onclick="closeModal()" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition">إلغاء</button>
             </div>
-            """,
-            unsafe_allow_html=True
-        )
+        </form>
+    </div>
+</div>
 
-        if st.button(
-            f"فتح الوحدة: {unit['name']}",
-            key=f"unit_{unit['id']}",
-            use_container_width=True
-        ):
+<footer class="bg-white border-t border-gray-200 py-4 mt-6 text-center text-sm text-gray-500 no-print">
+    © 2026 الشيف البيداغوجي – إعداد الأستاذة: حورية فرحي
+</footer>
 
-            st.session_state.unit_id = unit["id"]
-            st.session_state.page = "unit"
-            st.rerun()
+<script>
+    // ========================================================================
+    // 1. البيانات الافتراضية مع كل تفاصيل المقياس
+    // ========================================================================
+    const DEFAULT_DATA = {
+        programs: [
+            {
+                id: 'p1',
+                title: 'برنامج المرأة الماكثة بالبيت',
+                desc: 'برنامج شامل لتكوين المرأة الماكثة بالبيت في صناعة الحلويات',
+                hours: 84,
+                status: 'قيد التدقيق',
+                timeDistribution: [
+                    { stage: 'المقدمة', duration: '1 ساعة', notes: 'عرض شفهي' },
+                    { stage: 'تحضير الحشوة', duration: '10 ساعات', notes: 'تطبيقي' },
+                    { stage: 'إنجاز حلويات اللوز', duration: '29 ساعة', notes: '8 حلويات' },
+                    { stage: 'الطهي', duration: '13 ساعة', notes: 'فرن وقلي' },
+                    { stage: 'التشطيب', duration: '21 ساعة', notes: 'تطبيقي' },
+                    { stage: 'النشاط الشامل', duration: '5 ساعات', notes: 'إنتاج متكامل' },
+                    { stage: 'التقييم', duration: '5 ساعات', notes: 'نظري وعملي' }
+                ],
+                evaluationCriteria: [
+                    { criterion: 'احترام الوصفة', indicator: 'احترام المقادير والمراحل' },
+                    { criterion: 'التنظيم', indicator: 'ترتيب العمل واستغلال الوقت' },
+                    { criterion: 'التشكيل', indicator: 'انتظام ودقة الأشكال' },
+                    { criterion: 'الطهي', indicator: 'لون وقوام مناسب' },
+                    { criterion: 'التشطيب', indicator: 'نظافة ودقة التزيين' },
+                    { criterion: 'الطعم', indicator: 'توازن النكهات' },
+                    { criterion: 'القوام', indicator: 'مناسب لنوع الحلوى' },
+                    { criterion: 'النظافة', indicator: 'احترام قواعد النظافة والسلامة' },
+                    { criterion: 'التقديم', indicator: 'مظهر مهني جذاب' }
+                ],
+                theoryQuestions: [
+                    'ما أهمية وزن المواد الأولية بدقة؟',
+                    'ما دور راحة العجينة؟',
+                    'ما العوامل التي تؤثر في جودة الطهي؟',
+                    'كيف نميز الحلوى المطهية جيدًا؟',
+                    'ما شروط نجاح عجينة اللوز؟',
+                    'ما أهمية التحكم في قوام الحشوة؟',
+                    'ما قواعد النظافة الواجب احترامها أثناء العمل؟'
+                ],
+                modules: [
+                    {
+                        id: 'm1',
+                        title: 'MQ1 – إعداد حلويات اللوز',
+                        desc: 'إنجاز الحلويات التقليدية الجزائرية المصنوعة من اللوز (84 ساعة)',
+                        cards: [
+                            { id: 'c1', title: 'البقلاوة الجزائرية التقليدية', content: 'المقادير: لوز، عسل، عجين...\nالخطوات: التحضير، الطهي، التشطيب.', status: 'قيد التدقيق' },
+                            { id: 'c2', title: 'الكفتة الجزائرية', content: 'المقادير: لوز، سكر، زبدة...\nالخطوات: العجن، التشكيل، التزيين.', status: 'قيد التدقيق' },
+                            { id: 'c3', title: 'حلوة الفاكهة', content: 'المقادير: عجينة اللوز، ألوان غذائية...\nالخطوات: التلوين، التشكيل.', status: 'قيد التدقيق' },
+                            { id: 'c4', title: 'الثومية', content: 'المقادير: لوز، سكر، ماء زهر...\nالخطوات: التشكيل، التلوين.', status: 'قيد التدقيق' },
+                            { id: 'c5', title: 'حلوة المشكلة', content: 'المقادير: لوز، سكر، مكسرات...\nالخطوات: تحضير العجينة، الحشو، التشكيل.', status: 'قيد التدقيق' },
+                            { id: 'c6', title: 'العرايش الجزائرية', content: 'المقادير: فرينة، سمن، لوز...\nالخطوات: العجن، الحشو، الخبز.', status: 'قيد التدقيق' },
+                            { id: 'c7', title: 'التشاراك التقليدي', content: 'المقادير: فرينة، زبدة، سكر...\nالخطوات: العجن، التشكيل، الخبز.', status: 'قيد التدقيق' },
+                            { id: 'c8', title: 'الهريسية باللوز', content: 'المقادير: لوز، سكر، بيض...\nالخطوات: الخلط، الطهي، التسقية.', status: 'قيد التدقيق' }
+                        ]
+                    },
+                    {
+                        id: 'm2',
+                        title: 'MQ2 – تحضير الحشوات والكريمات',
+                        desc: 'تحضير الحشوات المختلفة المستخدمة في الحلويات',
+                        cards: [
+                            { id: 'c9', title: 'كريمة اللوز', content: 'مقادير وطريقة تحضير كريمة اللوز التقليدية.', status: 'قيد التدقيق' },
+                            { id: 'c10', title: 'الحشوة بالتمر', content: 'مقادير وطريقة تحضير حشوة التمر.', status: 'قيد التدقيق' }
+                        ]
+                    }
+                ]
+            }
+        ]
+    };
 
+    // ========================================================================
+    // 2. تحميل البيانات وحالة البطاقات
+    // ========================================================================
+    let appData = null;
+    let currentProgramId = null;
+    let modalType = null;
+    let editingId = null;
+    let cardStates = {};
 
-# =========================================================
-# 10. الوحدة
-# =========================================================
+    function loadData() {
+        const saved = localStorage.getItem('chef_advanced_data');
+        if (saved) {
+            try { appData = JSON.parse(saved); }
+            catch(e) { appData = JSON.parse(JSON.stringify(DEFAULT_DATA)); }
+        } else {
+            appData = JSON.parse(JSON.stringify(DEFAULT_DATA));
+        }
+        appData.programs.forEach(p => {
+            if (!p.modules) p.modules = [];
+            p.modules.forEach(m => { if (!m.cards) m.cards = []; });
+        });
+        saveData();
+        const states = localStorage.getItem('chef_advanced_states');
+        if (states) {
+            try { cardStates = JSON.parse(states); } catch(e) { cardStates = {}; }
+        }
+    }
 
-elif st.session_state.page == "unit":
+    function saveData() {
+        localStorage.setItem('chef_advanced_data', JSON.stringify(appData));
+        renderAdmin();
+    }
 
-    program = next(
-        (
-            p for p in db["programs"]
-            if p["id"] == st.session_state.program_id
-        ),
-        None
-    )
+    function saveCardStates() {
+        localStorage.setItem('chef_advanced_states', JSON.stringify(cardStates));
+    }
 
-    window = None
-    unit = None
+    function generateId() { return Date.now().toString(36) + Math.random().toString(36).substr(2, 5); }
 
-    if program:
+    // ========================================================================
+    // 3. العرض مع البطاقات المفتوحة وجميع التفاصيل
+    // ========================================================================
+    function renderPrograms() {
+        const container = document.getElementById('programList');
+        container.innerHTML = '';
+        appData.programs.forEach(p => {
+            const div = document.createElement('div');
+            div.className = 'program-card';
+            div.onclick = () => { currentProgramId = p.id; navigateTo('program'); renderProgramDetail(p.id); };
+            const badge = p.status === 'قيد التدقيق' ? 'badge-pending' : p.status === 'تمت المراجعة' ? 'badge-reviewed' : 'badge-draft';
+            div.innerHTML = `
+                <h3 class="font-bold text-lg text-gray-800">${p.title}</h3>
+                <p class="text-sm text-gray-500">${p.desc}</p>
+                <span class="bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-xs font-semibold">${p.hours || 0} ساعة</span>
+                <span class="${badge} block mt-2">${p.status}</span>
+            `;
+            container.appendChild(div);
+        });
+    }
 
-        window = next(
-            (
-                w for w in program.get("windows", [])
-                if w["id"] == st.session_state.window_id
-            ),
-            None
-        )
+    function renderProgramDetail(programId) {
+        const container = document.getElementById('programDetailContainer');
+        const p = appData.programs.find(pr => pr.id === programId);
+        if (!p) { container.innerHTML = '<p class="text-gray-400">البرنامج غير موجود</p>'; return; }
 
-    if window:
-
-        unit = next(
-            (
-                u for u in window.get("units", [])
-                if u["id"] == st.session_state.unit_id
-            ),
-            None
-        )
-
-    if not unit:
-        st.error("الوحدة غير موجودة.")
-        st.stop()
-
-    st.header(f"📂 {unit['name']}")
-
-    if st.button("← العودة إلى النافذة"):
-        st.session_state.page = "window"
-        st.rerun()
-
-    st.divider()
-
-    st.subheader("📖 الدروس")
-
-    for lesson in unit.get("lessons", []):
-
-        st.markdown(
-            f"""
-            <div class="card">
-                <h3>📖 {lesson['name']}</h3>
-                <p>{lesson.get('content', '')}</p>
-                <b>البطاقات التقنية: {len(lesson.get('technical_sheets', []))}</b>
-                <br>
-                <b>الوصفات: {len(lesson.get('recipes', []))}</b>
+        let html = `
+            <div class="bg-white rounded-xl shadow-soft border border-gray-100 p-6 mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">${p.title}</h2>
+                <p class="text-gray-500">${p.desc}</p>
+                <div class="mt-2 flex flex-wrap gap-3">
+                    <span class="bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-xs font-semibold">${p.hours} ساعة</span>
+                    <span class="badge-pending">${p.status}</span>
+                </div>
             </div>
-            """,
-            unsafe_allow_html=True
-        )
-
-        if st.button(
-            f"فتح الدرس: {lesson['name']}",
-            key=f"lesson_{lesson['id']}",
-            use_container_width=True
-        ):
-
-            st.session_state.lesson_id = lesson["id"]
-            st.session_state.page = "lesson"
-            st.rerun()
-
-
-# =========================================================
-# 11. الدرس
-# =========================================================
-
-elif st.session_state.page == "lesson":
-
-    lesson = None
-
-    for program in db["programs"]:
-
-        for window in program.get("windows", []):
-
-            for unit in window.get("units", []):
-
-                for l in unit.get("lessons", []):
-
-                    if l["id"] == st.session_state.lesson_id:
-                        lesson = l
-
-    if not lesson:
-        st.error("الدرس غير موجود.")
-        st.stop()
-
-    st.header(f"📖 {lesson['name']}")
-
-    if st.button("← العودة"):
-        st.session_state.page = "unit"
-        st.rerun()
-
-    st.divider()
-
-    st.subheader("🎯 الأهداف البيداغوجية")
-    st.write(lesson.get("objectives") or "لم تتم إضافة الأهداف بعد.")
-
-    st.subheader("🧠 الكفاءات المستهدفة")
-    st.write(lesson.get("competencies") or "لم تتم إضافة الكفاءات بعد.")
-
-    st.subheader("📐 المقاربة البيداغوجية")
-    st.write(lesson.get("pedagogy") or "لم تتم إضافة المقاربة البيداغوجية بعد.")
-
-    st.subheader("📚 المحتوى")
-    st.write(lesson.get("content") or "لم تتم إضافة محتوى الدرس بعد.")
-
-    st.subheader("⚙️ خطوات الإنجاز")
-    st.write(lesson.get("steps") or "لم تتم إضافة خطوات الإنجاز بعد.")
-
-    st.subheader("📋 التقييم")
-    st.write(lesson.get("evaluation") or "لم تتم إضافة طريقة التقييم بعد.")
-
-    st.divider()
-
-    # البطاقات التقنية
-
-    st.subheader("📋 البطاقات التقنية")
-
-    if lesson.get("technical_sheets"):
-
-        for sheet in lesson["technical_sheets"]:
-
-            with st.expander(sheet["title"]):
-
-                st.write("**الصنف:**", sheet.get("category", ""))
-                st.write("**المكونات:**", sheet.get("ingredients_list", ""))
-                st.write("**الكميات:**", sheet.get("quantities", ""))
-                st.write("**خطوات التحضير:**", sheet.get("steps", ""))
-                st.write("**درجة الحرارة:**", sheet.get("temperature", ""))
-                st.write("**وقت الطهي:**", sheet.get("bake_time", ""))
-                st.write("**وقت التحضير:**", sheet.get("prep_time", ""))
-                st.write("**المعدات:**", sheet.get("equipment", ""))
-                st.write("**معايير النجاح:**", sheet.get("success_criteria", ""))
-                st.write("**الأخطاء الشائعة:**", sheet.get("common_errors", ""))
-                st.write("**النظافة والسلامة:**", sheet.get("hygiene_rules", ""))
-                st.write("**ملاحظات:**", sheet.get("notes", ""))
-
-    else:
-        st.info("لا توجد بطاقات تقنية لهذا الدرس حالياً.")
-
-    # الوصفات
-
-    st.subheader("🧁 الوصفات")
-
-    if lesson.get("recipes"):
-
-        for recipe in lesson["recipes"]:
-
-            with st.expander(recipe["name"]):
-
-                st.write("**المكونات:**", recipe.get("ingredients", ""))
-                st.write("**الكميات:**", recipe.get("quantities", ""))
-                st.write("**طريقة التحضير:**", recipe.get("steps", ""))
-                st.write("**مدة التحضير:**", recipe.get("prep_time", ""))
-                st.write("**مدة الطهي:**", recipe.get("bake_time", ""))
-                st.write("**درجة الحرارة:**", recipe.get("temperature", ""))
-                st.write("**عدد الحصص:**", recipe.get("servings", ""))
-                st.write("**ملاحظات:**", recipe.get("notes", ""))
-
-    else:
-        st.info("لا توجد وصفات لهذا الدرس حالياً.")
-
-
-# =========================================================
-# 12. تسجيل الدخول
-# =========================================================
-
-elif st.session_state.page == "login":
-
-    st.header("🔐 دخول الإدارة")
-
-    password = st.text_input(
-        "كلمة مرور الإدارة",
-        type="password"
-    )
-
-    if st.button("دخول الإدارة", use_container_width=True):
-
-        if password == db["settings"].get("admin_password", "admin"):
-
-            st.session_state.admin = True
-            st.session_state.page = "admin"
-
-            st.success("تم تسجيل الدخول بنجاح.")
-            st.rerun()
-
-        else:
-            st.error("كلمة المرور غير صحيحة.")
-
-
-# =========================================================
-# 13. لوحة الإدارة
-# =========================================================
-
-elif st.session_state.page == "admin":
-
-    if not st.session_state.admin:
-
-        st.warning("يجب تسجيل الدخول أولاً.")
-        st.stop()
-
-    st.header("⚙️ لوحة الإدارة")
-
-    if st.button("🚪 تسجيل الخروج"):
-        st.session_state.admin = False
-        st.session_state.page = "home"
-        st.rerun()
-
-    tabs = st.tabs([
-        "📚 البرامج والنوافذ",
-        "📖 الدروس",
-        "📋 البطاقات",
-        "🧁 الوصفات",
-        "📝 الامتحانات",
-        "📁 الوثائق",
-        "⚙️ الإعدادات"
-    ])
-
-    # -----------------------------------------------------
-    # البرامج والنوافذ
-    # -----------------------------------------------------
-
-    with tabs[0]:
-
-        st.subheader("📚 إدارة البرامج")
-
-        for program in db["programs"]:
-
-            st.markdown(f"### {program['name']}")
-
-            st.write(program["description"])
-
-            st.write(
-                f"عدد النوافذ الحالية: {len(program.get('windows', []))}"
-            )
-
-            with st.expander("➕ إضافة نافذة جديدة"):
-
-                window_name = st.text_input(
-                    "اسم النافذة",
-                    key=f"wn_{program['id']}"
-                )
-
-                window_desc = st.text_area(
-                    "وصف النافذة",
-                    key=f"wd_{program['id']}"
-                )
-
-                if st.button(
-                    "إضافة النافذة",
-                    key=f"addw_{program['id']}"
-                ):
-
-                    if window_name.strip():
-
-                        program.setdefault("windows", []).append(
-                            default_window(
-                                window_name,
-                                window_desc
-                            )
-                        )
-
-                        save_data(db)
-
-                        st.success("تمت إضافة النافذة.")
-                        st.rerun()
-
-            for window in program.get("windows", []):
-
-                with st.expander(
-                    f"🪟 {window['name']}"
-                ):
-
-                    new_name = st.text_input(
-                        "تعديل اسم النافذة",
-                        value=window["name"],
-                        key=f"editw_{window['id']}"
-                    )
-
-                    if st.button(
-                        "حفظ اسم النافذة",
-                        key=f"savew_{window['id']}"
-                    ):
-
-                        window["name"] = new_name
-                        save_data(db)
-                        st.success("تم الحفظ.")
-                        st.rerun()
-
-                    st.write(
-                        f"عدد الوحدات: {len(window.get('units', []))}"
-                    )
-
-                    unit_name = st.text_input(
-                        "اسم وحدة جديدة",
-                        key=f"newunit_{window['id']}"
-                    )
-
-                    if st.button(
-                        "➕ إضافة وحدة",
-                        key=f"addunit_{window['id']}"
-                    ):
-
-                        if unit_name.strip():
-
-                            window.setdefault(
-                                "units", []
-                            ).append(
-                                default_unit(unit_name)
-                            )
-
-                            save_data(db)
-
-                            st.success("تمت إضافة الوحدة.")
-                            st.rerun()
-
-    # -----------------------------------------------------
-    # الدروس
-    # -----------------------------------------------------
-
-    with tabs[1]:
-
-        st.subheader("📖 إضافة درس كامل")
-
-        for program in db["programs"]:
-
-            for window in program.get("windows", []):
-
-                for unit in window.get("units", []):
-
-                    with st.expander(
-                        f"{program['name']} ← {window['name']} ← {unit['name']}"
-                    ):
-
-                        lesson_name = st.text_input(
-                            "عنوان الدرس",
-                            key=f"ln_{unit['id']}"
-                        )
-
-                        content = st.text_area(
-                            "المحتوى",
-                            key=f"lc_{unit['id']}"
-                        )
-
-                        objectives = st.text_area(
-                            "الأهداف",
-                            key=f"lo_{unit['id']}"
-                        )
-
-                        competencies = st.text_area(
-                            "الكفاءات",
-                            key=f"lco_{unit['id']}"
-                        )
-
-                        pedagogy = st.text_area(
-                            "المقاربة البيداغوجية",
-                            key=f"lp_{unit['id']}"
-                        )
-
-                        steps = st.text_area(
-                            "خطوات الإنجاز",
-                            key=f"ls_{unit['id']}"
-                        )
-
-                        evaluation = st.text_area(
-                            "التقييم",
-                            key=f"le_{unit['id']}"
-                        )
-
-                        if st.button(
-                            "💾 إضافة الدرس",
-                            key=f"addlesson_{unit['id']}"
-                        ):
-
-                            if lesson_name.strip():
-
-                                lesson = default_lesson(
-                                    lesson_name,
-                                    content
-                                )
-
-                                lesson["objectives"] = objectives
-                                lesson["competencies"] = competencies
-                                lesson["pedagogy"] = pedagogy
-                                lesson["steps"] = steps
-                                lesson["evaluation"] = evaluation
-
-                                unit.setdefault(
-                                    "lessons", []
-                                ).append(lesson)
-
-                                save_data(db)
-
-                                st.success(
-                                    "تمت إضافة الدرس بنجاح."
-                                )
-
-                                st.rerun()
-
-    # -----------------------------------------------------
-    # البطاقات التقنية
-    # -----------------------------------------------------
-
-    with tabs[2]:
-
-        st.subheader("📋 إضافة بطاقة تقنية")
-
-        lessons = []
-
-        for program in db["programs"]:
-            for window in program.get("windows", []):
-                for unit in window.get("units", []):
-                    for lesson in unit.get("lessons", []):
-
-                        lessons.append(
-                            (
-                                f"{program['name']} / "
-                                f"{window['name']} / "
-                                f"{unit['name']} / "
-                                f"{lesson['name']}",
-                                lesson
-                            )
-                        )
-
-        if lessons:
-
-            selected = st.selectbox(
-                "اختاري الدرس",
-                lessons,
-                format_func=lambda x: x[0]
-            )
-
-            lesson = selected[1]
-
-            title = st.text_input("عنوان البطاقة")
-            category = st.text_input("الصنف")
-
-            ingredients = st.text_area("المكونات")
-            quantities = st.text_area("الكميات")
-            steps = st.text_area("خطوات التحضير")
-
-            temperature = st.text_input("درجة الحرارة")
-            bake_time = st.text_input("وقت الطهي")
-            prep_time = st.text_input("وقت التحضير")
-
-            equipment = st.text_area("المعدات")
-            success = st.text_area("معايير النجاح")
-            errors = st.text_area("الأخطاء الشائعة")
-            hygiene = st.text_area("النظافة والسلامة")
-            notes = st.text_area("ملاحظات")
-
-            if st.button("💾 حفظ البطاقة التقنية"):
-
-                if title.strip():
-
-                    lesson.setdefault(
-                        "technical_sheets",
-                        []
-                    ).append({
-                        "id": uid("sheet"),
-                        "title": title,
-                        "category": category,
-                        "ingredients_list": ingredients,
-                        "quantities": quantities,
-                        "steps": steps,
-                        "temperature": temperature,
-                        "bake_time": bake_time,
-                        "prep_time": prep_time,
-                        "equipment": equipment,
-                        "success_criteria": success,
-                        "common_errors": errors,
-                        "hygiene_rules": hygiene,
-                        "notes": notes
-                    })
-
-                    save_data(db)
-
-                    st.success("تم حفظ البطاقة.")
-                    st.rerun()
-
-        else:
-            st.info("أضيفي درساً أولاً.")
-
-
-    # -----------------------------------------------------
-    # الوصفات
-    # -----------------------------------------------------
-
-    with tabs[3]:
-
-        st.subheader("🧁 إضافة وصفة")
-
-        lessons = []
-
-        for program in db["programs"]:
-            for window in program.get("windows", []):
-                for unit in window.get("units", []):
-                    for lesson in unit.get("lessons", []):
-
-                        lessons.append(
-                            (
-                                f"{program['name']} / "
-                                f"{window['name']} / "
-                                f"{unit['name']} / "
-                                f"{lesson['name']}",
-                                lesson
-                            )
-                        )
-
-        if lessons:
-
-            selected = st.selectbox(
-                "الدرس المرتبط بالوصفة",
-                lessons,
-                format_func=lambda x: x[0],
-                key="recipe_lesson"
-            )
-
-            lesson = selected[1]
-
-            name = st.text_input("اسم الوصفة")
-            ingredients = st.text_area("المكونات")
-            quantities = st.text_area("الكميات")
-            steps = st.text_area("طريقة التحضير")
-            prep = st.text_input("مدة التحضير")
-            bake = st.text_input("مدة الطهي")
-            temperature = st.text_input("درجة الحرارة")
-            servings = st.text_input("عدد الحصص")
-            notes = st.text_area("نصائح وملاحظات")
-
-            if st.button("💾 حفظ الوصفة"):
-
-                if name.strip():
-
-                    lesson.setdefault(
-                        "recipes",
-                        []
-                    ).append({
-                        "id": uid("recipe"),
-                        "name": name,
-                        "ingredients": ingredients,
-                        "quantities": quantities,
-                        "steps": steps,
-                        "prep_time": prep,
-                        "bake_time": bake,
-                        "temperature": temperature,
-                        "servings": servings,
-                        "notes": notes
-                    })
-
-                    save_data(db)
-
-                    st.success("تم حفظ الوصفة.")
-                    st.rerun()
-
-        else:
-            st.info("أضيفي درساً أولاً.")
-
-
-    # -----------------------------------------------------
-    # الامتحانات
-    # -----------------------------------------------------
-
-    with tabs[4]:
-
-        st.subheader("📝 إنشاء امتحان")
-
-        exam_title = st.text_input(
-            "عنوان الامتحان"
-        )
-
-        if st.button("➕ إنشاء الامتحان"):
-
-            if exam_title.strip():
-
-                db["exams"].append({
-                    "id": uid("exam"),
-                    "title": exam_title,
-                    "questions": []
-                })
-
-                save_data(db)
-
-                st.success("تم إنشاء الامتحان.")
-                st.rerun()
-
-        st.divider()
-
-        for exam in db["exams"]:
-
-            with st.expander(exam["title"]):
-
-                question = st.text_input(
-                    "نص السؤال",
-                    key=f"qt_{exam['id']}"
-                )
-
-                opt1 = st.text_input(
-                    "الخيار الأول",
-                    key=f"o1_{exam['id']}"
-                )
-
-                opt2 = st.text_input(
-                    "الخيار الثاني",
-                    key=f"o2_{exam['id']}"
-                )
-
-                opt3 = st.text_input(
-                    "الخيار الثالث",
-                    key=f"o3_{exam['id']}"
-                )
-
-                answer = st.number_input(
-                    "رقم الإجابة الصحيحة",
-                    min_value=0,
-                    max_value=2,
-                    value=0,
-                    key=f"ans_{exam['id']}"
-                )
-
-                points = st.number_input(
-                    "النقاط",
-                    min_value=1,
-                    value=5,
-                    key=f"pts_{exam['id']}"
-                )
-
-                if st.button(
-                    "➕ إضافة السؤال",
-                    key=f"addq_{exam['id']}"
-                ):
-
-                    if question.strip():
-
-                        exam["questions"].append({
-                            "id": uid("question"),
-                            "text": question,
-                            "options": [
-                                opt1,
-                                opt2,
-                                opt3
-                            ],
-                            "answer": int(answer),
-                            "points": int(points)
-                        })
-
-                        save_data(db)
-
-                        st.success("تمت إضافة السؤال.")
-                        st.rerun()
-
-
-    # -----------------------------------------------------
-    # الوثائق
-    # -----------------------------------------------------
-
-    with tabs[5]:
-
-        st.subheader("📁 إدارة الوثائق")
-
-        uploaded = st.file_uploader(
-            "رفع وثيقة",
-            type=[
-                "pdf",
-                "docx",
-                "xlsx",
-                "pptx",
-                "png",
-                "jpg",
-                "jpeg"
-            ]
-        )
-
-        if uploaded:
-
-            filename = (
-                uuid.uuid4().hex[:10]
-                + "_"
-                + uploaded.name
-            )
-
-            path = os.path.join(
-                UPLOADS_DIR,
-                filename
-            )
-
-            with open(path, "wb") as f:
-                f.write(uploaded.getbuffer())
-
-            db["documents"].append({
-                "id": uid("document"),
-                "title": uploaded.name,
-                "filename": filename,
-                "path": path,
-                "date": datetime.now().strftime(
-                    "%Y-%m-%d %H:%M"
-                )
-            })
-
-            save_data(db)
-
-            st.success("تم رفع الوثيقة.")
-            st.rerun()
-
-        for doc in db["documents"]:
-
-            col1, col2 = st.columns([4, 1])
-
-            with col1:
-                st.write(
-                    f"📄 {doc.get('title', '')}"
-                )
-
-            with col2:
-
-                if st.button(
-                    "🗑️ حذف",
-                    key=f"del_{doc['id']}"
-                ):
-
-                    path = doc.get("path")
-
-                    if path and os.path.exists(path):
-                        os.remove(path)
-
-                    db["documents"].remove(doc)
-
-                    save_data(db)
-
-                    st.success("تم حذف الوثيقة.")
-                    st.rerun()
-
-
-    # -----------------------------------------------------
-    # الإعدادات
-    # -----------------------------------------------------
-
-    with tabs[6]:
-
-        st.subheader("⚙️ إعدادات المنصة")
-
-        platform_name = st.text_input(
-            "اسم المنصة",
-            value=db["settings"].get(
-                "platform_name",
-                ""
-            )
-        )
-
-        supervisor = st.text_input(
-            "اسم الإشراف",
-            value=db["settings"].get(
-                "supervisor_name",
-                ""
-            )
-        )
-
-        new_password = st.text_input(
-            "كلمة مرور جديدة",
-            type="password"
-        )
-
-        if st.button("💾 حفظ الإعدادات"):
-
-            db["settings"]["platform_name"] = platform_name
-            db["settings"]["supervisor_name"] = supervisor
-
-            if new_password.strip():
-                db["settings"]["admin_password"] = new_password
-
-            save_data(db)
-
-            st.success("تم حفظ الإعدادات.")
-            st.rerun()
-
-
-# =========================================================
-# 14. الامتحانات للمتربصين
-# =========================================================
-
-elif st.session_state.page == "exams":
-
-    st.header("📝 الامتحانات")
-
-    if not db["exams"]:
-
-        st.info("لا توجد امتحانات حالياً.")
-
-    else:
-
-        for exam in db["exams"]:
-
-            st.markdown(
-                f"""
-                <div class="card">
-                    <h3>{exam['title']}</h3>
-                    <p>عدد الأسئلة: {len(exam.get('questions', []))}</p>
+        `;
+
+        // التوزيع الزمني
+        if (p.timeDistribution && p.timeDistribution.length) {
+            html += `
+                <div class="bg-white rounded-xl shadow-soft border border-gray-100 p-6 mb-6">
+                    <h4 class="font-bold text-gray-800 mb-4">⏱️ التوزيع الزمني</h4>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-right"><thead class="bg-gray-50"><tr><th class="p-2 border">المرحلة</th><th class="p-2 border">المدة</th><th class="p-2 border">ملاحظات</th></tr></thead><tbody>
+                            ${p.timeDistribution.map(row => `<tr><td class="p-2 border">${row.stage}</td><td class="p-2 border">${row.duration}</td><td class="p-2 border">${row.notes || ''}</td></tr>`).join('')}
+                        </tbody></table>
+                    </div>
                 </div>
-                """,
-                unsafe_allow_html=True
-            )
+            `;
+        }
 
-            if st.button(
-                f"▶️ بدء الامتحان",
-                key=f"start_{exam['id']}"
-            ):
-
-                st.session_state.exam_id = exam["id"]
-                st.session_state.page = "exam_session"
-                st.rerun()
-
-
-# =========================================================
-# 15. جلسة الامتحان
-# =========================================================
-
-elif st.session_state.page == "exam_session":
-
-    exam = next(
-        (
-            e for e in db["exams"]
-            if e["id"] == st.session_state.exam_id
-        ),
-        None
-    )
-
-    if not exam:
-        st.error("الامتحان غير موجود.")
-        st.stop()
-
-    st.header(f"📝 {exam['title']}")
-
-    student = st.text_input(
-        "اسم المتربص الثلاثي"
-    )
-
-    answers = {}
-
-    for index, question in enumerate(
-        exam.get("questions", [])
-    ):
-
-        options = question.get(
-            "options",
-            []
-        )
-
-        answers[question["id"]] = st.radio(
-            f"السؤال {index + 1}: {question['text']}",
-            range(len(options)),
-            format_func=lambda x, opts=options: opts[x],
-            key=f"answer_{question['id']}"
-        )
-
-    if st.button(
-        "📤 إرسال الإجابات والحصول على النتيجة"
-    ):
-
-        if not student.strip():
-
-            st.error(
-                "يرجى إدخال اسم المتربص."
-            )
-
-        else:
-
-            score = 0
-            total = 0
-
-            for question in exam.get(
-                "questions",
-                []
-            ):
-
-                points = question.get(
-                    "points",
-                    5
-                )
-
-                total += points
-
-                if answers.get(
-                    question["id"]
-                ) == question.get("answer"):
-
-                    score += points
-
-            percentage = (
-                round(
-                    score / total * 100,
-                    2
-                )
-                if total
-                else 0
-            )
-
-            status = (
-                "ناجح ✨"
-                if percentage >= 50
-                else
-                "يحتاج إلى إعادة المحاولة"
-            )
-
-            db["results"].append({
-                "id": uid("result"),
-                "student_name": student,
-                "exam_title": exam["title"],
-                "score": score,
-                "total": total,
-                "percentage": percentage,
-                "status": status,
-                "date": datetime.now().strftime(
-                    "%Y-%m-%d %H:%M"
-                )
-            })
-
-            save_data(db)
-
-            st.success(
-                f"النتيجة: {score} / {total}"
-            )
-
-            st.metric(
-                "النسبة",
-                f"{percentage}%"
-            )
-
-            st.info(status)
-
-
-# =========================================================
-# 16. النتائج
-# =========================================================
-
-elif st.session_state.page == "results":
-
-    st.header("📊 نتائج المتربصين")
-
-    if not db["results"]:
-
-        st.info("لا توجد نتائج مسجلة.")
-
-    else:
-
-        for result in reversed(
-            db["results"]
-        ):
-
-            st.markdown(
-                f"""
-                <div class="card">
-                    <b>المتربص:</b>
-                    {result['student_name']}<br>
-
-                    <b>الامتحان:</b>
-                    {result['exam_title']}<br>
-
-                    <b>النقطة:</b>
-                    {result['score']} / {result['total']}<br>
-
-                    <b>النسبة:</b>
-                    {result['percentage']}%<br>
-
-                    <b>الحالة:</b>
-                    {result['status']}<br>
-
-                    <b>التاريخ:</b>
-                    {result['date']}
+        // معايير التقييم
+        if (p.evaluationCriteria && p.evaluationCriteria.length) {
+            html += `
+                <div class="bg-white rounded-xl shadow-soft border border-gray-100 p-6 mb-6">
+                    <h4 class="font-bold text-gray-800 mb-4">⭐ معايير تقييم المنتوج النهائي</h4>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-right"><thead class="bg-gray-50"><tr><th class="p-2 border">المعيار</th><th class="p-2 border">مؤشر النجاح</th></tr></thead><tbody>
+                            ${p.evaluationCriteria.map(item => `<tr><td class="p-2 border">${item.criterion}</td><td class="p-2 border">${item.indicator}</td></tr>`).join('')}
+                        </tbody></table>
+                    </div>
                 </div>
-                """,
-                unsafe_allow_html=True
-            )
+            `;
+        }
 
+        // الأسئلة النظرية
+        if (p.theoryQuestions && p.theoryQuestions.length) {
+            html += `
+                <div class="bg-white rounded-xl shadow-soft border border-gray-100 p-6 mb-6">
+                    <h4 class="font-bold text-gray-800 mb-4">📝 أسئلة نظرية</h4>
+                    <ul class="text-sm text-gray-600 list-disc list-inside space-y-1">
+                        ${p.theoryQuestions.map(q => `<li>${q}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+        }
 
-# =========================================================
-# 17. البحث الشامل
-# =========================================================
+        // النظافة والسلامة
+        html += `
+            <div class="bg-white rounded-xl shadow-soft border border-gray-100 p-6 mb-6">
+                <h4 class="font-bold text-gray-800 mb-4">🧼 النظافة والسلامة المهنية</h4>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-600">
+                    <ul class="list-disc list-inside space-y-1"><li>غسل اليدين جيدًا</li><li>تنظيف وتعقيم سطح العمل</li><li>استعمال أدوات نظيفة</li><li>احترام شروط حفظ المواد الأولية</li></ul>
+                    <ul class="list-disc list-inside space-y-1"><li>التأكد من صلاحية المواد</li><li>استعمال الفرن والمعدات بطريقة آمنة</li><li>ارتداء اللباس المهني المناسب</li></ul>
+                </div>
+            </div>
+        `;
 
-elif st.session_state.page == "search":
+        // النشاط الشامل
+        html += `
+            <div class="bg-white rounded-xl shadow-soft border border-gray-100 p-6 mb-6">
+                <h4 class="font-bold text-gray-800 mb-4">🏆 النشاط الشامل</h4>
+                <p class="text-sm text-gray-600">في نهاية المقياس، ينجز المتكوّن منتوجًا متكاملًا باستعمال المهارات المكتسبة في الدروس السابقة.</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-3 text-sm text-gray-600">
+                    <ul class="list-disc list-inside space-y-1"><li>اختيار الوصفة</li><li>قراءة بطاقة الوصفة</li><li>تحضير المواد</li></ul>
+                    <ul class="list-disc list-inside space-y-1"><li>تنظيم مكان العمل</li><li>تنفيذ المراحل</li><li>التشطيب والتزيين</li></ul>
+                </div>
+                <p class="text-sm text-gray-700 mt-3 font-medium">📜 الكفاءة النهائية: ينجز المتكوّن حلوى تقليدية جزائرية قائمة على اللوز وفق الوصفة والتقنيات المهنية، مع احترام الجودة والنظافة والسلامة.</p>
+            </div>
+        `;
 
-    st.header("🔍 البحث الشامل")
+        // الوحدات والبطاقات
+        html += `<div class="mb-6"><h4 class="font-bold text-gray-800 mb-4">📚 الوحدات (${p.modules.length})</h4>`;
+        if (p.modules.length === 0) {
+            html += `<p class="text-gray-400 text-center py-6">لا توجد وحدات مسجلة لهذا البرنامج.</p>`;
+        } else {
+            p.modules.forEach(mod => {
+                html += `<div class="module-card"><h4 class="font-bold text-gray-800">📘 ${mod.title}</h4><p class="text-sm text-gray-500">${mod.desc}</p>`;
+                if (mod.cards && mod.cards.length > 0) {
+                    mod.cards.forEach(card => {
+                        const isOpen = cardStates[card.id] !== undefined ? cardStates[card.id] : true;
+                        const arrowClass = isOpen ? 'open' : '';
+                        const contentDisplay = isOpen ? 'block' : 'none';
+                        html += `
+                            <div class="card-item">
+                                <button class="accordion-btn" onclick="toggleCard('${card.id}')">
+                                    <span class="flex-1 text-right">📄 ${card.title}</span>
+                                    <span class="arrow ${arrowClass}">▼</span>
+                                </button>
+                                <div id="card-content-${card.id}" class="accordion-content" style="display: ${contentDisplay};">
+                                    <p class="text-sm text-gray-700 whitespace-pre-wrap">${card.content || 'لا يوجد محتوى'}</p>
+                                    <div class="flex gap-2 mt-2 no-print">
+                                        <button onclick="editCardContent('${card.id}')" class="btn-admin bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs">✏️ تعديل</button>
+                                        <button onclick="deleteCard('${card.id}')" class="btn-admin bg-red-100 text-red-700 px-2 py-1 rounded text-xs">🗑️ حذف</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    html += `<p class="text-sm text-gray-400">لا توجد بطاقات</p>`;
+                }
+                html += `
+                    <div class="flex gap-2 mt-3 no-print">
+                        <button onclick="editUnit('${mod.id}')" class="btn-admin bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs">✏️ تعديل</button>
+                        <button onclick="deleteUnit('${mod.id}')" class="btn-admin bg-red-100 text-red-700 px-2 py-1 rounded text-xs">🗑️ حذف</button>
+                        <button onclick="addCardToUnit('${mod.id}')" class="btn-admin bg-green-100 text-green-700 px-2 py-1 rounded text-xs">➕ بطاقة</button>
+                    </div>
+                `;
+                html += `</div>`;
+            });
+        }
+        html += `</div>`;
 
-    query = st.text_input(
-        "اكتبي كلمة البحث"
-    ).strip().lower()
+        // أزرار إدارة البرنامج
+        html += `
+            <div class="flex gap-3 mt-4 no-print">
+                <button onclick="editProgram('${p.id}')" class="btn-admin bg-blue-100 text-blue-700 px-3 py-1 rounded text-sm">✏️ تعديل البرنامج</button>
+                <button onclick="deleteProgram('${p.id}')" class="btn-admin bg-red-100 text-red-700 px-3 py-1 rounded text-sm">🗑️ حذف البرنامج</button>
+                <button onclick="addUnitToProgram('${p.id}')" class="btn-admin bg-green-100 text-green-700 px-3 py-1 rounded text-sm">➕ إضافة وحدة</button>
+            </div>
+        `;
 
-    if query:
+        container.innerHTML = html;
+    }
 
-        found = False
+    // ========================================================================
+    // 4. التحكم في فتح/طي البطاقات
+    // ========================================================================
+    function toggleCard(cardId) {
+        const current = cardStates[cardId] !== undefined ? cardStates[cardId] : true;
+        cardStates[cardId] = !current;
+        saveCardStates();
+        const content = document.getElementById(`card-content-${cardId}`);
+        if (content) {
+            content.style.display = cardStates[cardId] ? 'block' : 'none';
+        }
+        const btn = content?.closest('.card-item')?.querySelector('.accordion-btn .arrow');
+        if (btn) {
+            btn.classList.toggle('open', cardStates[cardId]);
+        }
+    }
 
-        for program in db["programs"]:
+    function toggleAllCards(programId, open) {
+        const p = appData.programs.find(pr => pr.id === programId);
+        if (!p) return;
+        p.modules.forEach(mod => {
+            mod.cards.forEach(card => {
+                cardStates[card.id] = open;
+            });
+        });
+        saveCardStates();
+        renderProgramDetail(programId);
+    }
 
-            if query in program["name"].lower():
+    // ========================================================================
+    // 5. التنقل
+    // ========================================================================
+    function navigateTo(page) {
+        document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
+        if (page === 'home') {
+            document.getElementById('page-home').classList.add('active');
+            renderPrograms();
+        } else if (page === 'program') {
+            document.getElementById('page-program').classList.add('active');
+            if (currentProgramId) renderProgramDetail(currentProgramId);
+        } else if (page === 'admin') {
+            document.getElementById('page-admin').classList.add('active');
+            renderAdmin();
+        }
+    }
 
-                found = True
+    // ========================================================================
+    // 6. الإدارة (عمليات CRUD)
+    // ========================================================================
+    function renderAdmin() {
+        document.getElementById('adminOutput').textContent = JSON.stringify(appData, null, 2);
+    }
 
-                st.success(
-                    f"📚 برنامج: {program['name']}"
-                )
+    function editProgram(id) {
+        const p = appData.programs.find(pr => pr.id === id);
+        if (!p) return;
+        const newTitle = prompt('تعديل اسم البرنامج:', p.title);
+        if (newTitle !== null) p.title = newTitle;
+        const newDesc = prompt('تعديل وصف البرنامج:', p.desc);
+        if (newDesc !== null) p.desc = newDesc;
+        const newHours = prompt('تعديل عدد الساعات:', p.hours);
+        if (newHours !== null) p.hours = parseInt(newHours) || 0;
+        saveData();
+        renderProgramDetail(id);
+    }
 
-            for window in program.get(
-                "windows",
-                []
-            ):
+    function deleteProgram(id) {
+        if (!confirm('هل أنت متأكد من حذف هذا البرنامج وجميع وحداته وبطاقاته؟')) return;
+        appData.programs = appData.programs.filter(p => p.id !== id);
+        saveData();
+        navigateTo('home');
+    }
 
-                if query in window["name"].lower():
+    function addUnitToProgram(programId) {
+        const p = appData.programs.find(pr => pr.id === programId);
+        if (!p) return;
+        const title = prompt('أدخل اسم الوحدة:');
+        if (!title) return;
+        const desc = prompt('أدخل وصف الوحدة:') || '';
+        p.modules.push({ id: generateId(), title, desc, cards: [] });
+        saveData();
+        renderProgramDetail(programId);
+    }
 
-                    found = True
+    function editUnit(unitId) {
+        let found = null;
+        let parentProg = null;
+        for (const p of appData.programs) {
+            const m = p.modules.find(mod => mod.id === unitId);
+            if (m) { found = m; parentProg = p; break; }
+        }
+        if (!found) return;
+        const newTitle = prompt('تعديل اسم الوحدة:', found.title);
+        if (newTitle !== null) found.title = newTitle;
+        const newDesc = prompt('تعديل وصف الوحدة:', found.desc);
+        if (newDesc !== null) found.desc = newDesc;
+        saveData();
+        if (parentProg) renderProgramDetail(parentProg.id);
+    }
 
-                    st.info(
-                        f"🪟 نافذة: {window['name']}"
-                    )
+    function deleteUnit(unitId) {
+        if (!confirm('حذف هذه الوحدة وجميع بطاقاتها؟')) return;
+        for (const p of appData.programs) {
+            const idx = p.modules.findIndex(m => m.id === unitId);
+            if (idx !== -1) {
+                p.modules.splice(idx, 1);
+                saveData();
+                renderProgramDetail(p.id);
+                return;
+            }
+        }
+    }
 
-                for unit in window.get(
-                    "units",
-                    []
-                ):
+    function addCardToUnit(unitId) {
+        let parentProg = null;
+        let unit = null;
+        for (const p of appData.programs) {
+            const m = p.modules.find(mod => mod.id === unitId);
+            if (m) { unit = m; parentProg = p; break; }
+        }
+        if (!unit) return;
+        const title = prompt('أدخل عنوان البطاقة:');
+        if (!title) return;
+        const content = prompt('أدخل محتوى البطاقة (وصف، مقادير، خطوات):') || '';
+        const newCard = { id: generateId(), title, content, status: 'قيد التدقيق' };
+        unit.cards.push(newCard);
+        cardStates[newCard.id] = true;
+        saveCardStates();
+        saveData();
+        if (parentProg) renderProgramDetail(parentProg.id);
+    }
 
-                    if query in unit["name"].lower():
+    function editCardContent(cardId) {
+        let card = null;
+        let parentProg = null;
+        for (const p of appData.programs) {
+            for (const m of p.modules) {
+                const c = m.cards.find(crd => crd.id === cardId);
+                if (c) { card = c; parentProg = p; break; }
+            }
+            if (card) break;
+        }
+        if (!card) return;
+        const newContent = prompt('تعديل محتوى البطاقة:', card.content);
+        if (newContent !== null) {
+            card.content = newContent;
+            saveData();
+            if (parentProg) renderProgramDetail(parentProg.id);
+        }
+    }
 
-                        found = True
+    function deleteCard(cardId) {
+        if (!confirm('حذف هذه البطاقة؟')) return;
+        for (const p of appData.programs) {
+            for (const m of p.modules) {
+                const idx = m.cards.findIndex(c => c.id === cardId);
+                if (idx !== -1) {
+                    m.cards.splice(idx, 1);
+                    delete cardStates[cardId];
+                    saveCardStates();
+                    saveData();
+                    renderProgramDetail(p.id);
+                    return;
+                }
+            }
+        }
+    }
 
-                        st.warning(
-                            f"📂 وحدة: {unit['name']}"
-                        )
+    function resetAllData() {
+        if (!confirm('تحذير: سيتم حذف جميع البيانات نهائياً. هل أنت متأكدة؟')) return;
+        appData.programs = [];
+        cardStates = {};
+        saveCardStates();
+        saveData();
+        navigateTo('home');
+        renderAdmin();
+    }
 
-                    for lesson in unit.get(
-                        "lessons",
-                        []
-                    ):
+    // ========================================================================
+    // 7. المودال (إضافة برامج/وحدات/بطاقات)
+    // ========================================================================
+    function openModal(type, id = null) {
+        modalType = type;
+        editingId = id;
+        const overlay = document.getElementById('modalOverlay');
+        const title = document.getElementById('modalTitle');
+        const fields = document.getElementById('modalFields');
 
-                        text = (
-                            lesson["name"]
-                            + " "
-                            + lesson.get(
-                                "content",
-                                ""
-                            )
-                        ).lower()
+        let html = '';
+        if (type === 'program') {
+            title.innerText = 'إضافة برنامج جديد';
+            html = `
+                <div class="mb-3"><label class="block text-sm font-bold">العنوان</label><input id="f_title" class="w-full border rounded p-2" required></div>
+                <div class="mb-3"><label class="block text-sm font-bold">الوصف</label><input id="f_desc" class="w-full border rounded p-2"></div>
+                <div class="mb-3"><label class="block text-sm font-bold">المدة (ساعات)</label><input id="f_hours" type="number" class="w-full border rounded p-2" value="0"></div>
+                <div class="mb-3"><label class="block text-sm font-bold">الحالة</label>
+                    <select id="f_status" class="w-full border rounded p-2">
+                        <option value="قيد التدقيق">قيد التدقيق</option>
+                        <option value="تمت المراجعة">تمت المراجعة</option>
+                        <option value="قيد التطوير">قيد التطوير</option>
+                    </select>
+                </div>
+            `;
+        } else if (type === 'unit') {
+            title.innerText = 'إضافة وحدة جديدة';
+            html = `
+                <div class="mb-3"><label class="block text-sm font-bold">عنوان الوحدة</label><input id="f_title" class="w-full border rounded p-2" required></div>
+                <div class="mb-3"><label class="block text-sm font-bold">الوصف</label><input id="f_desc" class="w-full border rounded p-2"></div>
+                <p class="text-xs text-gray-400">سيتم إضافة الوحدة إلى البرنامج الحالي المفتوح.</p>
+            `;
+        } else if (type === 'card') {
+            title.innerText = 'إضافة بطاقة جديدة';
+            html = `
+                <div class="mb-3"><label class="block text-sm font-bold">عنوان البطاقة</label><input id="f_title" class="w-full border rounded p-2" required></div>
+                <div class="mb-3"><label class="block text-sm font-bold">المحتوى</label><textarea id="f_content" class="w-full border rounded p-2" rows="4"></textarea></div>
+                <p class="text-xs text-gray-400">ستتم إضافة البطاقة إلى أول وحدة في البرنامج الحالي.</p>
+            `;
+        }
+        fields.innerHTML = html;
+        overlay.classList.add('active');
+    }
 
-                        if query in text:
+    function closeModal() {
+        document.getElementById('modalOverlay').classList.remove('active');
+        modalType = null;
+        editingId = null;
+    }
 
-                            found = True
+    function saveModalItem(e) {
+        e.preventDefault();
+        const title = document.getElementById('f_title')?.value.trim();
+        if (!title) { alert('الرجاء إدخال العنوان'); return; }
 
-                            st.write(
-                                f"📖 درس: {lesson['name']}"
-                            )
+        if (modalType === 'program') {
+            const desc = document.getElementById('f_desc')?.value || '';
+            const hours = parseInt(document.getElementById('f_hours')?.value) || 0;
+            const status = document.getElementById('f_status')?.value || 'قيد التدقيق';
+            appData.programs.push({
+                id: generateId(),
+                title,
+                desc,
+                hours,
+                status,
+                timeDistribution: [],
+                evaluationCriteria: [],
+                theoryQuestions: [],
+                modules: []
+            });
+        } else if (modalType === 'unit') {
+            const p = appData.programs.find(pr => pr.id === currentProgramId);
+            if (!p) { alert('لا يوجد برنامج مفتوح لإضافة وحدة إليه.'); return; }
+            const desc = document.getElementById('f_desc')?.value || '';
+            p.modules.push({ id: generateId(), title, desc, cards: [] });
+        } else if (modalType === 'card') {
+            const p = appData.programs.find(pr => pr.id === currentProgramId);
+            if (!p || p.modules.length === 0) { alert('البرنامج الحالي لا يحتوي على وحدات. أنشئ وحدة أولاً.'); return; }
+            const content = document.getElementById('f_content')?.value || '';
+            const newCard = { id: generateId(), title, content, status: 'قيد التدقيق' };
+            p.modules[0].cards.push(newCard);
+            cardStates[newCard.id] = true;
+            saveCardStates();
+        }
 
-        if not found:
+        saveData();
+        closeModal();
+        if (modalType === 'program') {
+            navigateTo('home');
+        } else {
+            if (currentProgramId) renderProgramDetail(currentProgramId);
+        }
+        renderAdmin();
+    }
 
-            st.warning(
-                "لم يتم العثور على نتائج."
-            )
+    // ========================================================================
+    // 8. بدء التشغيل
+    // ========================================================================
+    loadData();
+    renderPrograms();
+    renderAdmin();
+    console.log('🍰 المنصة المتقدمة جاهزة (جميع البطاقات مفتوحة)');
+</script>
+</body>
+</html>
