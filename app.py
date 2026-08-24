@@ -6,7 +6,7 @@ from datetime import datetime
 
 # إعدادات الصفحة
 st.set_page_config(
-    title="المنصة البيداغوجية للتكوين المهني (APC)",
+    page_title="المنصة البيداغوجية للتكوين المهني",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
