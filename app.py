@@ -1,24 +1,23 @@
 import json
 import os
 import uuid
-import streamlit as st
+import streamlit as str_lit
 from datetime import datetime
 
 # إعدادات الصفحة
-st.set_page_config(
+str_lit.set_page_config(
     page_title="المنصة البيداغوجية للتكوين المهني",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
-# مسارات الملفات الدائمة
-DATA_FILE = "platform_data.json"
+# تغيير اسم ملف البيانات لتجنب أي تداخل قديم
+DATA_FILE = "platform_data_v2.json"
 UPLOADS_DIR = "uploaded_files"
 
 if not os.path.exists(UPLOADS_DIR):
     os.makedirs(UPLOADS_DIR, exist_ok=True)
 
-# هيكل البيانات الافتراضي الشامل (يحتوي على البرامج الثلاثة الأساسية)
 DEFAULT_DATA = {
     "settings": {
         "platform_name": "المنصة البيداغوجية للتكوين المهني (APC)",
@@ -200,55 +199,41 @@ def load_data():
             data = json.load(f)
             if not isinstance(data, dict):
                 return DEFAULT_DATA
-            for key in DEFAULT_DATA:
-                if key not in data:
-                    data[key] = DEFAULT_DATA[key]
-            if "settings" not in data or not isinstance(data["settings"], dict):
-                data["settings"] = DEFAULT_DATA["settings"]
-            else:
-                for skey in DEFAULT_DATA["settings"]:
-                    if skey not in data["settings"]:
-                        data["settings"][skey] = DEFAULT_DATA["settings"][skey]
             return data
     except Exception:
         return DEFAULT_DATA
 
 def save_data(data):
-    temp_file = DATA_FILE + ".tmp"
     try:
-        with open(temp_file, "w", encoding="utf-8") as f:
+        with open(DATA_FILE, "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=4)
-        if os.path.exists(DATA_FILE):
-            os.replace(temp_file, DATA_FILE)
-        else:
-            os.rename(temp_file, DATA_FILE)
     except Exception as e:
-        st.error(f"حدث خطأ أثناء حفظ البيانات: {e}")
+        str_lit.error(f"خطأ في الحفظ: {e}")
 
-if "db" not in st.session_state:
-    st.session_state.db = load_data()
+if "db" not in str_lit.session_state:
+    str_lit.session_state.db = load_data()
 
-if "is_admin" not in st.session_state:
-    st.session_state.is_admin = False
+if "is_admin" not in str_lit.session_state:
+    str_lit.session_state.is_admin = False
 
-if "current_view" not in st.session_state:
-    st.session_state.current_view = "home"
+if "current_view" not in str_lit.session_state:
+    str_lit.session_state.current_view = "home"
 
-if "selected_program_id" not in st.session_state:
-    st.session_state.selected_program_id = None
+if "selected_program_id" not in str_lit.session_state:
+    str_lit.session_state.selected_program_id = None
 
-if "selected_unit_id" not in st.session_state:
-    st.session_state.selected_unit_id = None
+if "selected_unit_id" not in str_lit.session_state:
+    str_lit.session_state.selected_unit_id = None
 
-if "selected_lesson_id" not in st.session_state:
-    st.session_state.selected_lesson_id = None
+if "selected_lesson_id" not in str_lit.session_state:
+    str_lit.session_state.selected_lesson_id = None
 
-if "active_exam_id" not in st.session_state:
-    st.session_state.active_exam_id = None
+if "active_exam_id" not in str_lit.session_state:
+    str_lit.session_state.active_exam_id = None
 
-db = st.session_state.db
+db = str_lit.session_state.db
 
-st.markdown("""
+str_lit.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap');
     html, body, [class*="css"] {
@@ -276,68 +261,68 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-col_title, col_nav1, col_nav2, col_nav3, col_nav4 = st.columns([2, 1, 1, 1, 1])
+col_title, col_nav1, col_nav2, col_nav3, col_nav4 = str_lit.columns([2, 1, 1, 1, 1])
 with col_title:
     platform_title = db.get("settings", {}).get("platform_name", "المنصة البيداغوجية للتكوين المهني (APC)")
-    st.markdown(f"### 🥐 {platform_title}")
+    str_lit.markdown(f"### 🥐 {platform_title}")
 with col_nav1:
-    if st.button("🏠 الرئيسية", key="top_nav_home"):
-        st.session_state.current_view = "home"
-        st.rerun()
+    if str_lit.button("🏠 الرئيسية", key="top_nav_home"):
+        str_lit.session_state.current_view = "home"
+        str_lit.rerun()
 with col_nav2:
-    if st.button("🔍 البحث الشامل", key="top_nav_search"):
-        st.session_state.current_view = "search"
-        st.rerun()
+    if str_lit.button("🔍 البحث الشامل", key="top_nav_search"):
+        str_lit.session_state.current_view = "search"
+        str_lit.rerun()
 with col_nav3:
-    if st.button("📝 الامتحانات", key="top_nav_exams"):
-        st.session_state.current_view = "exams"
-        st.rerun()
+    if str_lit.button("📝 الامتحانات", key="top_nav_exams"):
+        str_lit.session_state.current_view = "exams"
+        str_lit.rerun()
 with col_nav4:
-    if st.session_state.is_admin:
-        if st.button("🚪 خروج المدير", key="top_nav_logout"):
-            st.session_state.is_admin = False
-            st.session_state.current_view = "home"
-            st.rerun()
+    if str_lit.session_state.is_admin:
+        if str_lit.button("🚪 خروج المدير", key="top_nav_logout"):
+            str_lit.session_state.is_admin = False
+            str_lit.session_state.current_view = "home"
+            str_lit.rerun()
     else:
-        if st.button("🔐 دخول الإدارة", key="top_nav_login"):
-            st.session_state.current_view = "admin_login"
-            st.rerun()
+        if str_lit.button("🔐 دخول الإدارة", key="top_nav_login"):
+            str_lit.session_state.current_view = "admin_login"
+            str_lit.rerun()
 
 supervisor_text = db.get("settings", {}).get("supervisor_name", "إشراف الأستاذة: فرحي حورية")
-st.markdown(f'<div class="supervisor-badge">✨ {supervisor_text}</div>', unsafe_allow_html=True)
-st.markdown("---")
+str_lit.markdown(f'<div class="supervisor-badge">✨ {supervisor_text}</div>', unsafe_allow_html=True)
+str_lit.markdown("---")
 
-if st.session_state.current_view == "admin_login":
-    st.subheader("تسجيل دخول المشرف (الإدارة)")
-    pwd = st.text_input("كلمة المرور", type="password", key="admin_pwd_input")
-    if st.button("دخول", key="admin_login_submit"):
+if str_lit.session_state.current_view == "admin_login":
+    str_lit.subheader("تسجيل دخول المشرف (الإدارة)")
+    pwd = str_lit.text_input("كلمة المرور", type="password", key="admin_pwd_input")
+    if str_lit.button("دخول", key="admin_login_submit"):
         admin_pass = db.get("settings", {}).get("admin_password", "admin")
         if pwd == admin_pass:
-            st.session_state.is_admin = True
-            st.session_state.current_view = "admin_dashboard"
-            st.success("تم تسجيل الدخول بنجاح!")
-            st.rerun()
+            str_lit.session_state.is_admin = True
+            str_lit.session_state.current_view = "admin_dashboard"
+            str_lit.success("تم تسجيل الدخول بنجاح!")
+            str_lit.rerun()
         else:
-            st.error("كلمة المرور غير صحيحة.")
+            str_lit.error("كلمة المرور غير صحيحة.")
 
-elif st.session_state.current_view == "admin_dashboard":
-    if not st.session_state.is_admin:
-        st.warning("يرجى تسجيل الدخول أولاً.")
-        st.session_state.current_view = "home"
-        st.rerun()
+elif str_lit.session_state.current_view == "admin_dashboard":
+    if not str_lit.session_state.is_admin:
+        str_lit.warning("يرجى تسجيل الدخول أولاً.")
+        str_lit.session_state.current_view = "home"
+        str_lit.rerun()
     
-    st.header("⚙️ لوحة التحكم والإدارة الشاملة للمنصة")
+    str_lit.header("⚙️ لوحة التحكم والإدارة الشاملة للمنصة")
     
-    tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7 = str_lit.tabs([
         "البرامج والوحدات", "الدروس", "البطاقات التقنية", "الوصفات", "الامتحانات والأسئلة", "الوثائق والنتائج", "الإعدادات"
     ])
     
     with tab1:
-        st.subheader("إدارة البرامج والوحدات")
-        with st.form("add_prog_form"):
-            p_name = st.text_input("اسم البرنامج الجديد")
-            p_desc = st.text_area("وصف البرنامج")
-            if st.form_submit_button("إضافة البرنامج") and p_name:
+        str_lit.subheader("إدارة البرامج والوحدات")
+        with str_lit.form("add_prog_form"):
+            p_name = str_lit.text_input("اسم البرنامج الجديد")
+            p_desc = str_lit.text_area("وصف البرنامج")
+            if str_lit.form_submit_button("إضافة البرنامج") and p_name:
                 db["programs"].append({
                     "id": f"prog_{uuid.uuid4().hex[:8]}",
                     "name": p_name,
@@ -345,58 +330,58 @@ elif st.session_state.current_view == "admin_dashboard":
                     "units": []
                 })
                 save_data(db)
-                st.success("تم إضافة البرنامج بنجاح!")
-                st.rerun()
+                str_lit.success("تم إضافة البرنامج بنجاح!")
+                str_lit.rerun()
         
-        st.markdown("---")
+        str_lit.markdown("---")
         if db["programs"]:
-            p_sel = st.selectbox("اختر البرنامج لإدارة وحداته", [p["id"] for p in db["programs"]], format_func=lambda x: next((p["name"] for p in db["programs"] if p["id"] == x), x), key="admin_prog_select")
+            p_sel = str_lit.selectbox("اختر البرنامج لإدارة وحداته", [p["id"] for p in db["programs"]], format_func=lambda x: next((p["name"] for p in db["programs"] if p["id"] == x), x), key="admin_prog_select")
             prog_obj = next((p for p in db["programs"] if p["id"] == p_sel), None)
             
             if prog_obj:
-                with st.form("add_unit_form"):
-                    u_name = st.text_input("اسم الوحدة أو التخصص الجديد")
-                    if st.form_submit_button("إضافة الوحدة") and u_name:
+                with str_lit.form("add_unit_form"):
+                    u_name = str_lit.text_input("اسم الوحدة أو التخصص الجديد")
+                    if str_lit.form_submit_button("إضافة الوحدة") and u_name:
                         prog_obj["units"].append({
                             "id": f"unit_{uuid.uuid4().hex[:8]}",
                             "name": u_name,
                             "lessons": []
                         })
                         save_data(db)
-                        st.success("تم إضافة الوحدة بنجاح!")
-                        st.rerun()
+                        str_lit.success("تم إضافة الوحدة بنجاح!")
+                        str_lit.rerun()
                 
-                st.markdown("### الوحدات الحالية وتعديلها:")
+                str_lit.markdown("### الوحدات الحالية وتعديلها:")
                 for idx, u in enumerate(list(prog_obj["units"])):
-                    col_u1, col_u2 = st.columns([3, 1])
+                    col_u1, col_u2 = str_lit.columns([3, 1])
                     with col_u1:
-                        new_u_name = st.text_input(f"تعديل اسم الوحدة {idx+1}", value=u["name"], key=f"edit_u_{u['id']}")
+                        new_u_name = str_lit.text_input(f"تعديل اسم الوحدة {idx+1}", value=u["name"], key=f"edit_u_{u['id']}")
                         if new_u_name != u["name"]:
                             u["name"] = new_u_name
                             save_data(db)
                     with col_u2:
-                        if st.button("حذف الوحدة", key=f"del_u_{u['id']}"):
+                        if str_lit.button("حذف الوحدة", key=f"del_u_{u['id']}"):
                             prog_obj["units"].remove(u)
                             save_data(db)
-                            st.rerun()
+                            str_lit.rerun()
 
     with tab2:
-        st.subheader("إدارة الدروس بالتفصيل البيداغوجي")
+        str_lit.subheader("إدارة الدروس بالتفصيل البيداغوجي")
         if db["programs"]:
-            p_choice = st.selectbox("اختر البرنامج للدرس", db["programs"], format_func=lambda x: x["name"], key="l_p_admin")
+            p_choice = str_lit.selectbox("اختر البرنامج للدرس", db["programs"], format_func=lambda x: x["name"], key="l_p_admin")
             if p_choice.get("units"):
-                u_choice = st.selectbox("اختر الوحدة أو النظير", p_choice["units"], format_func=lambda x: x["name"], key="l_u_admin")
+                u_choice = str_lit.selectbox("اختر الوحدة أو النظير", p_choice["units"], format_func=lambda x: x["name"], key="l_u_admin")
                 
-                with st.form("add_lesson_full"):
-                    l_name = st.text_input("عنوان الدرس")
-                    l_content = st.text_area("المحتوى المفصل للدرس")
-                    l_obj = st.text_area("أهداف الدرس")
-                    l_comp = st.text_area("الكفاءات المستهدفة")
-                    l_ped = st.text_area("المقاربة البيداغوجية")
-                    l_steps = st.text_area("خطوات الإنجاز")
-                    l_eval = st.text_area("طريقة التقييم")
+                with str_lit.form("add_lesson_full"):
+                    l_name = str_lit.text_input("عنوان الدرس")
+                    l_content = str_lit.text_area("المحتوى المفصل للدرس")
+                    l_obj = str_lit.text_area("أهداف الدرس")
+                    l_comp = str_lit.text_area("الكفاءات المستهدفة")
+                    l_ped = str_lit.text_area("المقاربة البيداغوجية")
+                    l_steps = str_lit.text_area("خطوات الإنجاز")
+                    l_eval = str_lit.text_area("طريقة التقييم")
                     
-                    if st.form_submit_button("حفظ وإضافة الدرس") and l_name:
+                    if str_lit.form_submit_button("حفظ وإضافة الدرس") and l_name:
                         u_choice["lessons"].append({
                             "id": f"lesson_{uuid.uuid4().hex[:8]}",
                             "name": l_name,
@@ -410,15 +395,15 @@ elif st.session_state.current_view == "admin_dashboard":
                             "recipes": []
                         })
                         save_data(db)
-                        st.success("تم إضافة الدرس بنجاح!")
-                        st.rerun()
+                        str_lit.success("تم إضافة الدرس بنجاح!")
+                        str_lit.rerun()
             else:
-                st.info("الرجاء إضافة وحدة لهذا البرنامج أولاً.")
+                str_lit.info("الرجاء إضافة وحدة لهذا البرنامج أولاً.")
         else:
-            st.info("الرجاء إضافة برنامج أولاً.")
+            str_lit.info("الرجاء إضافة برنامج أولاً.")
 
     with tab3:
-        st.subheader("إدارة البطاقات التقنية الكاملة")
+        str_lit.subheader("إدارة البطاقات التقنية الكاملة")
         all_lessons = []
         for p in db["programs"]:
             for u in p.get("units", []):
@@ -426,25 +411,25 @@ elif st.session_state.current_view == "admin_dashboard":
                     all_lessons.append((f"{p['name']} > {u['name']} > {l['name']}", p, u, l))
         
         if all_lessons:
-            les_sel = st.selectbox("اختر الدرس المرتبط بالبطاقة التقنية", all_lessons, format_func=lambda x: x[0], key="ts_les_select")
+            les_sel = str_lit.selectbox("اختر الدرس المرتبط بالبطاقة التقنية", all_lessons, format_func=lambda x: x[0], key="ts_les_select")
             p_obj, u_obj, l_obj = les_sel[1], les_sel[2], les_sel[3]
             
-            with st.form("add_tech_sheet_form"):
-                ts_title = st.text_input("اسم البطاقة التقنية")
-                ts_cat = st.text_input("الصنف (مثال: حلويات تقليدية، غربية، شرقية)")
-                ts_ing = st.text_area("المكونات")
-                ts_qty = st.text_area("الكميات والوحدات")
-                ts_steps = st.text_area("خطوات التحضير")
-                ts_temp = st.text_input("درجة الحرارة (مثال: 160°C)")
-                ts_bake = st.text_input("وقت الطهي")
-                ts_prep = st.text_input("وقت التحضير")
-                ts_eq = st.text_area("المعدات المطلوبة")
-                ts_succ = st.text_area("معايير النجاح")
-                ts_err = st.text_area("الأخطاء الشائعة")
-                ts_hyg = st.text_area("قواعد النظافة والسلامة")
-                ts_notes = st.text_area("ملاحظات إضافية")
+            with str_lit.form("add_tech_sheet_form"):
+                ts_title = str_lit.text_input("اسم البطاقة التقنية")
+                ts_cat = str_lit.text_input("الصنف (مثال: حلويات تقليدية، غربية، شرقية)")
+                ts_ing = str_lit.text_area("المكونات")
+                ts_qty = str_lit.text_area("الكميات والوحدات")
+                ts_steps = str_lit.text_area("خطوات التحضير")
+                ts_temp = str_lit.text_input("درجة الحرارة")
+                ts_bake = str_lit.text_input("وقت الطهي")
+                ts_prep = str_lit.text_input("وقت التحضير")
+                ts_eq = str_lit.text_area("المعدات المطلوبة")
+                ts_succ = str_lit.text_area("معايير النجاح")
+                ts_err = str_lit.text_area("الأخطاء الشائعة")
+                ts_hyg = str_lit.text_area("قواعد النظافة والسلامة")
+                ts_notes = str_lit.text_area("ملاحظات إضافية")
                 
-                if st.form_submit_button("حفظ البطاقة التقنية") and ts_title:
+                if str_lit.form_submit_button("حفظ البطاقة التقنية") and ts_title:
                     if "technical_sheets" not in l_obj:
                         l_obj["technical_sheets"] = []
                     l_obj["technical_sheets"].append({
@@ -464,29 +449,29 @@ elif st.session_state.current_view == "admin_dashboard":
                         "notes": ts_notes
                     })
                     save_data(db)
-                    st.success("تم إضافة البطاقة التقنية بنجاح!")
-                    st.rerun()
+                    str_lit.success("تم إضافة البطاقة التقنية بنجاح!")
+                    str_lit.rerun()
         else:
-            st.info("يجب إضافة درس واحد على الأقل أولاً.")
+            str_lit.info("يجب إضافة درس واحد على الأقل أولاً.")
 
     with tab4:
-        st.subheader("إدارة الوصفات الفنية الكاملة")
+        str_lit.subheader("إدارة الوصفات الفنية الكاملة")
         if all_lessons:
-            les_sel_r = st.selectbox("اختر الدرس المرتبط بالوصفة", all_lessons, format_func=lambda x: x[0], key="rec_les_select")
+            les_sel_r = str_lit.selectbox("اختر الدرس المرتبط بالوصفة", all_lessons, format_func=lambda x: x[0], key="rec_les_select")
             p_o, u_o, l_o = les_sel_r[1], les_sel_r[2], les_sel_r[3]
             
-            with st.form("add_recipe_form"):
-                rec_name = st.text_input("اسم الوصفة")
-                rec_ing = st.text_area("المكونات الأساسية")
-                rec_qty = st.text_area("الكميات الدقيقة")
-                rec_steps = st.text_area("طريقة التحضير")
-                rec_prep = st.text_input("مدة التحضير")
-                rec_bake = st.text_input("مدة الطهي")
-                rec_temp = st.text_input("درجة الحرارة")
-                rec_serv = st.text_input("عدد الحصص")
-                rec_notes = st.text_area("نصائح وملاحظات")
+            with str_lit.form("add_recipe_form"):
+                rec_name = str_lit.text_input("اسم الوصفة")
+                rec_ing = str_lit.text_area("المكونات الأساسية")
+                rec_qty = str_lit.text_area("الكميات الدقيقة")
+                rec_steps = str_lit.text_area("طريقة التحضير")
+                rec_prep = str_lit.text_input("مدة التحضير")
+                rec_bake = str_lit.text_input("مدة الطهي")
+                rec_temp = str_lit.text_input("درجة الحرارة")
+                rec_serv = str_lit.text_input("عدد الحصص")
+                rec_notes = str_lit.text_area("نصائح وملاحظات")
                 
-                if st.form_submit_button("حفظ الوصفة") and rec_name:
+                if str_lit.form_submit_button("حفظ الوصفة") and rec_name:
                     if "recipes" not in l_o:
                         l_o["recipes"] = []
                     l_o["recipes"].append({
@@ -502,18 +487,18 @@ elif st.session_state.current_view == "admin_dashboard":
                         "notes": rec_notes
                     })
                     save_data(db)
-                    st.success("تم إضافة الوصفة بنجاح!")
-                    st.rerun()
+                    str_lit.success("تم إضافة الوصفة بنجاح!")
+                    str_lit.rerun()
         else:
-            st.info("يجب إضافة درس واحد على الأقل أولاً.")
+            str_lit.info("يجب إضافة درس واحد على الأقل أولاً.")
 
     with tab5:
-        st.subheader("إدارة الامتحانات والأسئلة الشاملة")
-        with st.form("create_exam_admin"):
-            ex_title = st.text_input("عنوان الامتحان")
+        str_lit.subheader("إدارة الامتحانات والأسئلة الشاملة")
+        with str_lit.form("create_exam_admin"):
+            ex_title = str_lit.text_input("عنوان الامتحان")
             if all_lessons:
-                ex_les = st.selectbox("ربط الامتحان بالدرس", all_lessons, format_func=lambda x: x[0], key="ex_les_select")
-                if st.form_submit_button("إنشاء الامتحان") and ex_title:
+                ex_les = str_lit.selectbox("ربط الامتحان بالدرس", all_lessons, format_func=lambda x: x[0], key="ex_les_select")
+                if str_lit.form_submit_button("إنشاء الامتحان") and ex_title:
                     db["exams"].append({
                         "id": f"exam_{uuid.uuid4().hex[:8]}",
                         "title": ex_title,
@@ -523,29 +508,29 @@ elif st.session_state.current_view == "admin_dashboard":
                         "questions": []
                     })
                     save_data(db)
-                    st.success("تم إنشاء الامتحان بنجاح!")
-                    st.rerun()
+                    str_lit.success("تم إنشاء الامتحان بنجاح!")
+                    str_lit.rerun()
             else:
-                st.warning("أضف دروساً أولاً.")
+                str_lit.warning("أضف دروساً أولاً.")
 
-        st.markdown("---")
+        str_lit.markdown("---")
         if db["exams"]:
-            sel_ex_q = st.selectbox("اختر الامتحان لإضافة الأسئلة إليه", db["exams"], format_func=lambda x: x["title"], key="ex_q_select")
-            with st.form("add_q_form"):
-                q_txt = st.text_input("نص السؤال")
-                q_type = st.selectbox("نوع السؤال", ["mcq", "true_false"], format_func=lambda x: "اختيار من متعدد" if x=="mcq" else "صح / خطأ")
+            sel_ex_q = str_lit.selectbox("اختر الامتحان لإضافة الأسئلة إليه", db["exams"], format_func=lambda x: x["title"], key="ex_q_select")
+            with str_lit.form("add_q_form"):
+                q_txt = str_lit.text_input("نص السؤال")
+                q_type = str_lit.selectbox("نوع السؤال", ["mcq", "true_false"], format_func=lambda x: "اختيار من متعدد" if x=="mcq" else "صح / خطأ")
                 if q_type == "mcq":
-                    opt1 = st.text_input("الخيار 1", "الخيار أ")
-                    opt2 = st.text_input("الخيار 2", "الخيار ب")
-                    opt3 = st.text_input("الخيار 3", "الخيار ج")
+                    opt1 = str_lit.text_input("الخيار 1", "الخيار أ")
+                    opt2 = str_lit.text_input("الخيار 2", "الخيار ب")
+                    opt3 = str_lit.text_input("الخيار 3", "الخيار ج")
                     options = [opt1, opt2, opt3]
-                    corr = st.number_input("رقم الإجابة الصحيحة (0، 1، 2)", min_value=0, max_value=2, value=0)
+                    corr = str_lit.number_input("رقم الإجابة الصحيحة (0، 1، 2)", min_value=0, max_value=2, value=0)
                 else:
                     options = ["خطأ", "صحيح"]
-                    corr = st.selectbox("الإجابة الصحيحة", [0, 1], format_func=lambda x: options[x], key="tf_corr_select")
+                    corr = str_lit.selectbox("الإجابة الصحيحة", [0, 1], format_func=lambda x: options[x], key="tf_corr_select")
                 
-                pts = st.number_input("النقاط", min_value=1, value=5)
-                if st.form_submit_button("إضافة السؤال") and q_txt:
+                pts = str_lit.number_input("النقاط", min_value=1, value=5)
+                if str_lit.form_submit_button("إضافة السؤال") and q_txt:
                     if "questions" not in sel_ex_q:
                         sel_ex_q["questions"] = []
                     sel_ex_q["questions"].append({
@@ -557,12 +542,12 @@ elif st.session_state.current_view == "admin_dashboard":
                         "points": int(pts)
                     })
                     save_data(db)
-                    st.success("تم إضافة السؤال بنجاح!")
-                    st.rerun()
+                    str_lit.success("تم إضافة السؤال بنجاح!")
+                    str_lit.rerun()
 
     with tab6:
-        st.subheader("إدارة الوثائق والملفات ونتائج المتربصين")
-        uploaded_file = st.file_uploader("رفع ملف جديد", type=["pdf", "docx", "xlsx", "pptx", "png", "jpg", "jpeg"])
+        str_lit.subheader("إدارة الوثائق والملفات ونتائج المتربصين")
+        uploaded_file = str_lit.file_uploader("رفع ملف جديد", type=["pdf", "docx", "xlsx", "pptx", "png", "jpg", "jpeg"])
         if uploaded_file is not None:
             file_ext = os.path.splitext(uploaded_file.name)[1]
             safe_filename = f"{uuid.uuid4().hex[:8]}{file_ext}"
@@ -580,16 +565,16 @@ elif st.session_state.current_view == "admin_dashboard":
                 "date": datetime.now().strftime("%Y-%m-%d %H:%M")
             })
             save_data(db)
-            st.success("تم رفع الملف بنجاح!")
-            st.rerun()
+            str_lit.success("تم رفع الملف بنجاح!")
+            str_lit.rerun()
         
-        st.markdown("### الملفات المرفوعة:")
+        str_lit.markdown("### الملفات المرفوعة:")
         for doc in list(db.get("documents", [])):
-            col_d1, col_d2 = st.columns([3, 1])
+            col_d1, col_d2 = str_lit.columns([3, 1])
             with col_d1:
-                st.write(f"📄 {doc.get('title', 'ملف بدون عنوان')}")
+                str_lit.write(f"📄 {doc.get('title', 'ملف بدون عنوان')}")
             with col_d2:
-                if st.button("حذف الملف", key=f"del_doc_{doc['id']}"):
+                if str_lit.button("حذف الملف", key=f"del_doc_{doc['id']}"):
                     path_to_rm = doc.get("path")
                     if path_to_rm and os.path.exists(path_to_rm):
                         try:
@@ -598,27 +583,27 @@ elif st.session_state.current_view == "admin_dashboard":
                             pass
                     db["documents"].remove(doc)
                     save_data(db)
-                    st.rerun()
+                    str_lit.rerun()
         
-        st.markdown("---")
-        st.subheader("📊 نتائج الامتحانات المسجلة للمتربصين:")
+        str_lit.markdown("---")
+        str_lit.subheader("📊 نتائج الامتحانات المسجلة للمتربصين:")
         if db.get("results"):
             for res in db["results"]:
-                st.markdown(f"""
+                str_lit.markdown(f"""
                 <div class="card-custom">
                     <b>المتربص:</b> {res.get('student_name', '')} | <b>الامتحان:</b> {res.get('exam_title', '')} | <b>التاريخ:</b> {res.get('date', '')}<br>
                     <b>النقطة:</b> {res.get('score', 0)} / {res.get('total', 0)} ({res.get('percentage', 0)}%) - <b>الحالة:</b> {res.get('status', '')}
                 </div>
                 """, unsafe_allow_html=True)
         else:
-            st.info("لا توجد نتائج مسجلة حتى الآن.")
+            str_lit.info("لا توجد نتائج مسجلة حتى الآن.")
 
     with tab7:
-        st.subheader("إعدادات المنصة")
-        p_name_new = st.text_input("اسم المنصة", value=db.get("settings", {}).get("platform_name", ""))
-        sup_name_new = st.text_input("نص الإشراف", value=db.get("settings", {}).get("supervisor_name", ""))
-        pwd_new = st.text_input("كلمة مرور الإدارة الجديدة", type="password", key="settings_new_pwd")
-        if st.button("حفظ التغييرات", key="save_settings_btn"):
+        str_lit.subheader("إعدادات المنصة")
+        p_name_new = str_lit.text_input("اسم المنصة", value=db.get("settings", {}).get("platform_name", ""))
+        sup_name_new = str_lit.text_input("نص الإشراف", value=db.get("settings", {}).get("supervisor_name", ""))
+        pwd_new = str_lit.text_input("كلمة مرور الإدارة الجديدة", type="password", key="settings_new_pwd")
+        if str_lit.button("حفظ التغييرات", key="save_settings_btn"):
             if "settings" not in db:
                 db["settings"] = {}
             db["settings"]["platform_name"] = p_name_new
@@ -626,89 +611,89 @@ elif st.session_state.current_view == "admin_dashboard":
             if pwd_new:
                 db["settings"]["admin_password"] = pwd_new
             save_data(db)
-            st.success("تم حفظ الإعدادات بنجاح!")
-            st.rerun()
+            str_lit.success("تم حفظ الإعدادات بنجاح!")
+            str_lit.rerun()
 
-elif st.session_state.current_view == "search":
-    st.header("🔍 البحث الشامل في محتوى المنصة")
-    query = st.text_input("أدخل كلمة البحث", key="global_search_input").strip().lower()
+elif str_lit.session_state.current_view == "search":
+    str_lit.header("🔍 البحث الشامل في محتوى المنصة")
+    query = str_lit.text_input("أدخل كلمة البحث", key="global_search_input").strip().lower()
     
     if query:
         found = False
         for p in db.get("programs", []):
             if query in p.get("name", "").lower() or query in p.get("description", "").lower():
                 found = True
-                st.info(f"📁 برنامج: {p.get('name', '')}")
-                if st.button("انتقل للبرنامج", key=f"s_p_{p['id']}"):
-                    st.session_state.selected_program_id = p["id"]
-                    st.session_state.current_view = "program_view"
-                    st.rerun()
+                str_lit.info(f"📁 برنامج: {p.get('name', '')}")
+                if str_lit.button("انتقل للبرنامج", key=f"s_p_{p['id']}"):
+                    str_lit.session_state.selected_program_id = p["id"]
+                    str_lit.session_state.current_view = "program_view"
+                    str_lit.rerun()
             
             for u in p.get("units", []):
                 if query in u.get("name", "").lower():
                     found = True
-                    st.success(f"📂 وحدة/تخصص: {u.get('name', '')} (تابعة لـ {p.get('name', '')})")
-                    if st.button(f"عرض تفاصيل {u.get('name', '')}", key=f"s_u_{u['id']}"):
-                        st.session_state.selected_program_id = p["id"]
-                        st.session_state.selected_unit_id = u["id"]
-                        st.session_state.current_view = "unit_view"
-                        st.rerun()
+                    str_lit.success(f"📂 وحدة/تخصص: {u.get('name', '')} (تابعة لـ {p.get('name', '')})")
+                    if str_lit.button(f"عرض تفاصيل {u.get('name', '')}", key=f"s_u_{u['id']}"):
+                        str_lit.session_state.selected_program_id = p["id"]
+                        str_lit.session_state.selected_unit_id = u["id"]
+                        str_lit.session_state.current_view = "unit_view"
+                        str_lit.rerun()
                 
                 for l in u.get("lessons", []):
                     if query in l.get("name", "").lower() or query in l.get("content", "").lower():
                         found = True
-                        st.warning(f"📖 درس: {l.get('name', '')}")
-                        if st.button("فتح الدرس مباشرة", key=f"s_l_{l['id']}"):
-                            st.session_state.selected_program_id = p["id"]
-                            st.session_state.selected_unit_id = u["id"]
-                            st.session_state.selected_lesson_id = l["id"]
-                            st.session_state.current_view = "lesson_view"
-                            st.rerun()
+                        str_lit.warning(f"📖 درس: {l.get('name', '')}")
+                        if str_lit.button("فتح الدرس مباشرة", key=f"s_l_{l['id']}"):
+                            str_lit.session_state.selected_program_id = p["id"]
+                            str_lit.session_state.selected_unit_id = u["id"]
+                            str_lit.session_state.selected_lesson_id = l["id"]
+                            str_lit.session_state.current_view = "lesson_view"
+                            str_lit.rerun()
 
         if not found:
-            st.warning("لم يتم العثور على نتائج تطابق بحثك.")
+            str_lit.warning("لم يتم العثور على نتائج تطابق بحثك.")
 
-elif st.session_state.current_view == "exams":
-    st.header("📝 الامتحانات المتاحة للمتربصين")
+elif str_lit.session_state.current_view == "exams":
+    str_lit.header("📝 الامتحانات المتاحة للمتربصين")
     if not db.get("exams"):
-        st.info("لا توجد امتحانات متاحة حالياً.")
+        str_lit.info("لا توجد امتحانات متاحة حالياً.")
     else:
         for ex in db["exams"]:
             q_count = len(ex.get("questions", []))
-            st.markdown(f"""
+            str_lit.markdown(f"""
             <div class="card-custom">
                 <h4>{ex.get('title', 'امتحان بدون عنوان')}</h4>
                 <p>عدد الأسئلة: {q_count}</p>
             </div>
             """, unsafe_allow_html=True)
             if q_count > 0:
-                if st.button(f"ابدأ الامتحان: {ex.get('title', '')}", key=f"start_ex_{ex['id']}"):
-                    st.session_state.active_exam_id = ex["id"]
-                    st.session_state.current_view = "exam_session"
-                    st.rerun()
+                if str_lit.button(f"ابدأ الامتحان: {ex.get('title', '')}", key=f"start_ex_{ex['id']}"):
+                    str_lit.session_state.active_exam_id = ex["id"]
+                    str_lit.session_state.current_view = "exam_session"
+                    str_lit.rerun()
 
-elif st.session_state.current_view == "exam_session":
-    ex_obj = next((e for e in db.get("exams", []) if e["id"] == st.session_state.active_exam_id), None)
+elif str_lit.session_state.current_view == "exam_session":
+    ex_obj = next((e for e in db.get("exams", []) if e["id"] == str_lit.session_state.active_exam_id), None)
     if not ex_obj or not ex_obj.get("questions"):
-        st.error("الامتحان غير موجود.")
-        st.session_state.current_view = "exams"
-        st.rerun()
+        str_lit.error("الامتحان غير موجود.")
+        str_lit.session_state.current_view = "exams"
+        str_lit.rerun()
     
-    st.header(f"📝 امتحان: {ex_obj.get('title', '')}")
-    student_name = st.text_input("اسم المتربص الثلاثي:", key="exam_student_name_input")
+    str_lit.header(f"📝 امتحان: {ex_obj.get('title', '')}")
+    student_name = str_lit.text_input("اسم المتربص الثلاثي:", key="exam_student_name_input")
     
-    with st.form("exam_form_sub"):
+    with str_lit.form("exam_form_sub"):
         answers = {}
         for idx, q in enumerate(ex_obj.get("questions", [])):
-            st.markdown(f"**السؤال {idx+1}: {q.get('text', '')}** (النقاط: {q.get('points', 5)})")
+            str_lit.markdown(f"**السؤال {idx+1}: {q.get('text', '')}** (النقاط: {q.get('points', 5)})")
             options = q.get("options", ["خطأ", "صحيح"])
-            ans = st.radio("اختر الإجابة:", list(range(len(options))), format_func=lambda x: options[x], key=f"ans_{q.get('id', idx)}")
+            ans = str_lit.radio("اختر الإجابة:", list(range(len(options))), format_func=lambda x: options[x], key=f"ans_{q.get('id', idx)}")
             answers[q.get('id', idx)] = ans
-            st.markdown("---")
+            str_lit.markdown("---")
             
-        if st.form_submit_button("إرسال الإجابات والحصول على النتيجة"):
+        if str_lit.form_submit_button("إرسال الإجابات والحصول على النتيجة"):
             if not student_name.strip():
-                st.error("يرجى إدخال اسم المتربص أولاً.")
+                str_lit.error("يرجى إدخال اسم المتربص أولاً.")
             else:
                 score = 0
                 questions_list = ex_obj.get("questions", [])
@@ -734,90 +719,90 @@ elif st.session_state.current_view == "exam_session":
                 })
                 save_data(db)
                 
-                st.success(f"🎉 النتيجة النهائية للمتربص {student_name}: {score} / {total} ({percentage}%) - {status}")
+                str_lit.success(f"🎉 النتيجة النهائية للمتربص {student_name}: {score} / {total} ({percentage}%) - {status}")
 
-elif st.session_state.current_view == "home":
-    st.header("🌟 برامج التكوين المهني في فنون الطهي وصناعة الحلويات")
-    st.markdown("اختر البرنامج الأساسي المناسب للتصفح الهرمي:")
+elif str_lit.session_state.current_view == "home":
+    str_lit.header("🌟 برامج التكوين المهني في فنون الطهي وصناعة الحلويات")
+    str_lit.markdown("اختر البرنامج الأساسي المناسب للتصفح الهرمي:")
     
     if not db.get("programs"):
-        st.info("لا توجد برامج متاحة حالياً.")
+        str_lit.info("لا توجد برامج متاحة حالياً.")
     else:
         for p in db["programs"]:
-            st.markdown(f"""
+            str_lit.markdown(f"""
             <div class="card-custom">
                 <h3>📁 {p.get('name', '')}</h3>
                 <p>{p.get('description', '')}</p>
             </div>
             """, unsafe_allow_html=True)
-            if st.button(f"استعراض أقسام وتخصصات: {p.get('name', '')}", key=f"p_btn_{p['id']}"):
-                st.session_state.selected_program_id = p["id"]
-                st.session_state.current_view = "program_view"
-                st.rerun()
+            if str_lit.button(f"استعراض أقسام وتخصصات: {p.get('name', '')}", key=f"p_btn_{p['id']}"):
+                str_lit.session_state.selected_program_id = p["id"]
+                str_lit.session_state.current_view = "program_view"
+                str_lit.rerun()
 
-elif st.session_state.current_view == "program_view":
-    prog = next((p for p in db.get("programs", []) if p["id"] == st.session_state.selected_program_id), None)
+elif str_lit.session_state.current_view == "program_view":
+    prog = next((p for p in db.get("programs", []) if p["id"] == str_lit.session_state.selected_program_id), None)
     if prog:
-        st.header(f"📁 البرنامج: {prog.get('name', '')}")
-        if st.button("← العودة للبرامج الرئيسية", key="back_home_btn"):
-            st.session_state.current_view = "home"
-            st.rerun()
+        str_lit.header(f"📁 البرنامج: {prog.get('name', '')}")
+        if str_lit.button("← العودة للبرامج الرئيسية", key="back_home_btn"):
+            str_lit.session_state.current_view = "home"
+            str_lit.rerun()
             
-        st.markdown("---")
-        st.markdown("### الفروع والنوافذ المتاحة ضمن هذا البرنامج:")
+        str_lit.markdown("---")
+        str_lit.markdown("### الفروع والنوافذ المتاحة ضمن هذا البرنامج:")
         if not prog.get("units"):
-            st.info("لا توجد وحدات أو فروع مضافة في هذا البرنامج.")
+            str_lit.info("لا توجد وحدات أو فروع مضافة في هذا البرنامج.")
         else:
             for u in prog["units"]:
-                st.markdown(f"""
+                str_lit.markdown(f"""
                 <div class="card-custom">
                     <h4>📂 {u.get('name', '')}</h4>
                 </div>
                 """, unsafe_allow_html=True)
-                col_u1, col_u2 = st.columns([3, 1])
+                col_u1, col_u2 = str_lit.columns([3, 1])
                 with col_u2:
-                    if st.button(f"فتح النافذة", key=f"open_u_{u['id']}"):
-                        st.session_state.selected_unit_id = u["id"]
-                        st.session_state.current_view = "unit_view"
-                        st.rerun()
+                    if str_lit.button(f"فتح النافذة", key=f"open_u_{u['id']}"):
+                        str_lit.session_state.selected_unit_id = u["id"]
+                        str_lit.session_state.current_view = "unit_view"
+                        str_lit.rerun()
 
-elif st.session_state.current_view == "unit_view":
-    prog = next((p for p in db.get("programs", []) if p["id"] == st.session_state.selected_program_id), None)
-    unit = next((u for u in prog.get("units", []) if u["id"] == st.session_state.selected_unit_id), None) if prog else None
+elif str_lit.session_state.current_view == "unit_view":
+    prog = next((p for p in db.get("programs", []) if p["id"] == str_lit.session_state.selected_program_id), None)
+    unit = next((u for u in prog.get("units", []) if u["id"] == str_lit.session_state.selected_unit_id), None) if prog else None
     
     if unit:
-        st.header(f"📂 النافذة / الفرع: {unit.get('name', '')}")
-        if st.button("← العودة للبرنامج السابق", key="back_prog_from_unit"):
-            st.session_state.current_view = "program_view"
-            st.rerun()
+        str_lit.header(f"📂 النافذة / الفرع: {unit.get('name', '')}")
+        if str_lit.button("← العودة للبرنامج السابق", key="back_prog_from_unit"):
+            str_lit.session_state.current_view = "program_view"
+            str_lit.rerun()
             
-        st.markdown("---")
-        st.markdown("### الدروس والمحتويات البيداغوجية المتوفرة:")
+        str_lit.markdown("---")
+        str_lit.markdown("### الدروس والمحتويات البيداغوجية المتوفرة:")
         if not unit.get("lessons"):
-            st.info("لا توجد دروس مضافة في هذه النافذة حالياً.")
+            str_lit.info("لا توجد دروس مضافة في هذه النافذة حالياً.")
         else:
             for l in unit["lessons"]:
-                col_l1, col_l2 = st.columns([3, 1])
+                col_l1, col_l2 = str_lit.columns([3, 1])
                 with col_l1:
-                    st.write(f"📖 درس: **{l.get('name', '')}**")
+                    str_lit.write(f"📖 درس: **{l.get('name', '')}**")
                 with col_l2:
-                    if st.button("فتح الدرس والبطاقات", key=f"open_l_{l['id']}"):
-                        st.session_state.selected_lesson_id = l["id"]
-                        st.session_state.current_view = "lesson_view"
-                        st.rerun()
+                    if str_lit.button("فتح الدرس والبطاقات", key=f"open_l_{l['id']}"):
+                        str_lit.session_state.selected_lesson_id = l["id"]
+                        str_lit.session_state.current_view = "lesson_view"
+                        str_lit.rerun()
 
-elif st.session_state.current_view == "lesson_view":
-    prog = next((p for p in db.get("programs", []) if p["id"] == st.session_state.selected_program_id), None)
-    unit = next((u for u in prog.get("units", []) if u["id"] == st.session_state.selected_unit_id), None) if prog else None
-    lesson = next((l for l in unit.get("lessons", []) if l["id"] == st.session_state.selected_lesson_id), None) if unit else None
+elif str_lit.session_state.current_view == "lesson_view":
+    prog = next((p for p in db.get("programs", []) if p["id"] == str_lit.session_state.selected_program_id), None)
+    unit = next((u for u in prog.get("units", []) if u["id"] == str_lit.session_state.selected_unit_id), None) if prog else None
+    lesson = next((l for l in unit.get("lessons", []) if l["id"] == str_lit.session_state.selected_lesson_id), None) if unit else None
     
     if lesson:
-        st.header(f"📖 الدرس: {lesson.get('name', '')}")
-        if st.button("← العودة للنافذة السابقة", key="back_unit_btn"):
-            st.session_state.current_view = "unit_view"
-            st.rerun()
+        str_lit.header(f"📖 الدرس: {lesson.get('name', '')}")
+        if str_lit.button("← العودة للنافذة السابقة", key="back_unit_btn"):
+            str_lit.session_state.current_view = "unit_view"
+            str_lit.rerun()
             
-        st.markdown(f"""
+        str_lit.markdown(f"""
         <div class="card-custom">
             <h4>🎯 الأهداف البيداغوجية</h4>
             <p>{lesson.get('objectives', 'غير محدد')}</p>
@@ -834,10 +819,10 @@ elif st.session_state.current_view == "lesson_view":
         </div>
         """, unsafe_allow_html=True)
         
-        st.subheader("📋 البطاقات التقنية المرتبطة بالدرس")
+        str_lit.subheader("📋 البطاقات التقنية المرتبطة بالدرس")
         if lesson.get("technical_sheets"):
             for ts in lesson["technical_sheets"]:
-                st.markdown(f"""
+                str_lit.markdown(f"""
                 <div class="card-custom">
                     <h4>{ts.get('title', '')} ({ts.get('category', '')})</h4>
                     <p><b>المكونات:</b> {ts.get('ingredients_list', '')}</p>
@@ -852,12 +837,12 @@ elif st.session_state.current_view == "lesson_view":
                 </div>
                 """, unsafe_allow_html=True)
         else:
-            st.info("لا توجد بطاقات تقنية مرتبطة بهذا الدرس.")
+            str_lit.info("لا توجد بطاقات تقنية مرتبطة بهذا الدرس.")
             
-        st.subheader("🧁 الوصفات الفنية المرتبطة بالدرس")
+        str_lit.subheader("🧁 الوصفات الفنية المرتبطة بالدرس")
         if lesson.get("recipes"):
             for rec in lesson["recipes"]:
-                st.markdown(f"""
+                str_lit.markdown(f"""
                 <div class="card-custom">
                     <h4>{rec.get('name', '')}</h4>
                     <p><b>المكونات:</b> {rec.get('ingredients', '')}</p>
@@ -868,4 +853,4 @@ elif st.session_state.current_view == "lesson_view":
                 </div>
                 """, unsafe_allow_html=True)
         else:
-            st.info("لا توجد وصفات مرتبطة بهذا الدرس.")
+            str_lit.info("لا توجد وصفات مرتبطة بهذا الدرس.")
