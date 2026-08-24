@@ -1,566 +1,836 @@
+import json
+import os
+import uuid
 import streamlit as st
-import streamlit.components.v1 as components
+from datetime import datetime
 
-# إعدادات الصفحة الشاملة والمهنية
+# إعدادات الصفحة
 st.set_page_config(
     page_title="المنصة البيداغوجية للتكوين المهني (APC)",
-    page_icon="🎓",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
-# إخفاء عناصر غيت هاب وشريط ستريمليت العلوي لتوفير واجهة منصة مستقلة كلياً
-st.markdown(
-    """
-    <style>
-        .stAppHeader, .stSidebar, .st-emotion-cache-1r6slb0, footer {
-            display: none !important;
-        }
-        .main > div {
-            padding-top: 0rem !important;
-            padding-bottom: 0rem !important;
-        }
-        .block-container {
-            padding: 0rem !important;
-            max-width: 100% !important;
-        }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
+# مسارات الملفات الدائمة
+DATA_FILE = "platform_data.json"
+UPLOADS_DIR = "uploaded_files"
 
-html_code = """
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>المنصة البيداغوجية للتكوين المهني (APC)</title>
-    <style>
-        :root {
-            --primary-dark: #231915;      /* شوكولاتة داكنة وعميقة ومحترفة */
-            --primary-coffee: #4a352d;    /* قهوة دافئة وأنيقة */
-            --primary-accent: #6b4c3b;    /* تدرج قهوة راقي للأزرار */
-            --gold-accent: #a88544;       /* ذهبي هادئ وراقي */
-            --gold-light: #dfc89d;        /* ذهبي خفيف للحدود المميزة */
-            --bg-page: #f6f3ee;           /* خلفية كريمية ناعمة ومريحة للعين */
-            --card-bg: #ffffff;           /* أبيض ناصع للبطاقات */
-            --text-main: #251e1b;         /* لون النصوص الرئيسية واضح */
-            --text-muted: #665750;        /* لون النصوص الثانوية */
-            --border-color: #dfd4c8;      /* حدود دافئة متناسقة */
-            --border-radius: 16px;
-        }
-        
-        * { 
-            box-sizing: border-box; 
-            margin: 0;
-            padding: 0;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-page);
-            color: var(--text-main);
-            direction: rtl;
-            text-align: right;
-            -webkit-font-smoothing: antialiased;
-            overflow-x: hidden;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
+if not os.path.exists(UPLOADS_DIR):
+    os.makedirs(UPLOADS_DIR, exist_ok=True)
 
-        /* رأس المنصة البيداغوجية الفاخر والأكاديمي */
-        header {
-            background: linear-gradient(135deg, var(--primary-dark), var(--primary-coffee));
-            color: white;
-            padding: 50px 20px;
-            text-align: center;
-            box-shadow: 0 6px 25px rgba(35, 25, 21, 0.2);
-            border-bottom: 4px solid var(--gold-accent);
-            position: relative;
-        }
-
-        header::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--gold-accent), transparent);
-        }
-
-        .header-content {
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        header h1 {
-            margin: 0 0 12px 0;
-            font-size: 28px;
-            font-weight: 700;
-            color: #ffffff;
-            letter-spacing: -0.3px;
-        }
-
-        header h2 {
-            margin: 0 0 10px 0;
-            font-size: 18px;
-            font-weight: 500;
-            color: var(--gold-light);
-        }
-
-        header p {
-            margin: 0;
-            font-size: 14px;
-            color: #d1c2b4;
-            font-weight: 400;
-        }
-
-        /* حاوية المحتوى الرئيسية */
-        .container {
-            max-width: 1100px;
-            width: 100%;
-            margin: 40px auto;
-            padding: 0 20px;
-            flex: 1;
-        }
-
-        /* العوالم والصفحات الديناميكية */
-        .view-section {
-            display: none;
-            background: var(--card-bg);
-            padding: 40px 35px;
-            border-radius: var(--border-radius);
-            box-shadow: 0 12px 35px rgba(35, 25, 21, 0.05);
-            margin-bottom: 30px;
-            border: 1px solid var(--border-color);
-            animation: fadeIn 0.3s ease-in-out;
-        }
-
-        .view-section.active { display: block; }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .section-title {
-            text-align: center;
-            margin-bottom: 35px;
-        }
-
-        .section-title h2 {
-            color: var(--primary-dark);
-            font-size: 24px;
-            margin-bottom: 8px;
-            font-weight: 600;
-        }
-
-        .section-title p {
-            color: var(--text-muted);
-            font-size: 14px;
-            margin: 0;
-        }
-
-        /* شبكة البطاقات المهنية الأنيقة */
-        .grid-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 25px;
-            margin-top: 20px;
-        }
-
-        .card {
-            background: var(--card-bg);
-            border: 2px solid var(--border-color);
-            border-radius: var(--border-radius);
-            padding: 35px 25px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            outline: none;
-            position: relative;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        .card:focus-visible { 
-            outline: 3px solid var(--gold-accent); 
-            outline-offset: 3px;
-        }
-
-        .card:hover, .card:active {
-            border-color: var(--gold-accent);
-            transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(168, 133, 68, 0.12);
-            background: #fffefd;
-        }
-
-        .card.apprenticeship { border-top: 5px solid #6b4c3b; }
-        .card.presence { border-top: 5px solid #4a6b5d; }
-        .card.homemaker { border-top: 5px solid #8c6d48; }
-
-        .card-icon {
-            font-size: 40px;
-            margin-bottom: 18px;
-            background: #f4efe9;
-            width: 75px;
-            height: 75px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            border: 1px solid var(--border-color);
-            transition: transform 0.25s ease;
-        }
-
-        .card:hover .card-icon { transform: scale(1.08); }
-
-        .card h3 {
-            color: var(--primary-dark);
-            margin: 0 0 12px 0;
-            font-size: 19px;
-            font-weight: 600;
-        }
-
-        .card p {
-            color: var(--text-muted);
-            font-size: 13.5px;
-            margin: 0 0 25px 0;
-            line-height: 1.6;
-            flex-grow: 1;
-        }
-
-        .btn-entry {
-            background-color: var(--primary-accent);
-            color: white;
-            border: none;
-            padding: 10px 24px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 13.5px;
-            pointer-events: none;
-            transition: background 0.2s ease;
-        }
-
-        .card:hover .btn-entry {
-            background-color: var(--primary-dark);
-        }
-
-        /* شريط مسار التنقل (Breadcrumb) وأزرار التحكم العلوية */
-        .nav-controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-
-        .breadcrumb {
-            font-size: 13.5px;
-            color: var(--text-muted);
-            font-weight: 500;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: #f4efe9;
-            padding: 9px 16px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-        }
-
-        .nav-buttons-group {
-            display: flex;
-            gap: 10px;
-        }
-
-        .btn-action {
-            background-color: var(--primary-coffee);
-            padding: 9px 18px;
-            font-size: 13.5px;
-            border-radius: 8px;
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            transition: background 0.2s ease;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        .btn-action:hover {
-            background-color: var(--primary-dark);
-        }
-
-        .btn-home {
-            background-color: var(--gold-accent);
-        }
-        .btn-home:hover {
-            background-color: #8e6f36;
-        }
-
-        /* فضاء الحاويات المعيارية (Modular Containers) لاستقبال المحتوى مستقبلاً بدون إعادة بناء */
-        .modular-space {
-            margin-top: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .empty-placeholder {
-            text-align: center;
-            padding: 50px 20px;
-            background: #faf7f2;
-            border-radius: var(--border-radius);
-            border: 1px dashed var(--gold-accent);
-            color: var(--text-muted);
-            font-size: 14px;
-        }
-
-        /* Footer احترافي وأنيق */
-        footer {
-            background-color: var(--primary-dark);
-            color: #ab9a8c;
-            text-align: center;
-            padding: 25px 20px;
-            font-size: 13.5px;
-            border-top: 2px solid var(--gold-accent);
-            margin-top: auto;
-        }
-
-        footer p {
-            margin: 0;
-            letter-spacing: 0.3px;
-        }
-
-        /* التوافق التام والتام مع الهواتف الذكية بنسبة 100% */
-        @media (max-width: 768px) {
-            header { padding: 35px 15px; }
-            header h1 { font-size: 21px; }
-            header h2 { font-size: 15px; }
-            header p { font-size: 12.5px; }
-            .container { margin: 20px auto; padding: 0 12px; }
-            .view-section { padding: 25px 18px; }
-            .grid-cards { grid-template-columns: 1fr; gap: 18px; }
-            .card { padding: 28px 20px; }
-            .nav-controls { flex-direction: column; align-items: stretch; }
-            .breadcrumb { width: 100%; justify-content: center; }
-            .nav-buttons-group { justify-content: space-between; }
-            .btn-action { flex: 1; justify-content: center; }
-        }
-    </style>
-</head>
-<body>
-
-    <header>
-        <div class="header-content">
-            <h1>المنصة البيداغوجية للتكوين المهني (APC)</h1>
-            <h2>تحت إشراف الأستاذة فرحي حورية</h2>
-            <p>التكوين المهني في صناعة الحلويات</p>
-        </div>
-    </header>
-
-    <div class="container" id="app-container"></div>
-
-    <footer>
-        <p>© فرحي حورية - جميع الحقوق محفوظة للمنصة البيداغوجية للتكوين المهني (APC)</p>
-    </footer>
-
-    <script>
-        /**
-         * =========================================================================
-         * معمارية البيانات المجدولة وقابلة للتوسع (Modular Data Architecture)
-         * =========================================================================
-         * تم فصل محتوى المسارات بالكامل هنا. عند إرسال المحتوى لاحقاً، يتم ملء 
-         * هذه الحاويات (Units, Lessons, Technical Cards, Assessments) ديناميكياً.
-         */
-        const platformData = {
-            main: {
-                id: 'main-view',
-                title: 'اختر مسارك التكويني',
-                subtitle: 'بوابة الوصول إلى العوالم البيداغوجية المتخصصة',
-                isMain: true,
-                children: [
-                    { id: 'apprenticeship-view', icon: '📘', title: 'برنامج التمهين', desc: 'المسار المخصص للجمع بين التكوين التطبيقي والدروس النظرية.', className: 'apprenticeship' },
-                    { id: 'presence-view', icon: '🏫', title: 'البرنامج الحضوري', desc: 'المسار المخصص للتكوين النظامي داخل الهياكل البيداغوجية.', className: 'presence' },
-                    { id: 'homemaker-view', icon: '👩‍🍳', title: 'برنامج المرأة الماكثة بالبيت', desc: 'المسار المخصص لتطوير المهارات وإنشاء المشاريع المهنية.', className: 'homemaker' }
-                ]
-            },
-            pages: {
-                'apprenticeship-view': {
-                    title: 'عالم برنامج التمهين',
-                    subtitle: 'الفضاء البيداغوجي الخاص بمسار التمهين',
-                    breadcrumb: '🏠 الرئيسية ← برنامج التمهين',
-                    backTo: 'main-view',
-                    // حاويات معيارية مستقبلية (Modular Containers)
-                    units: [],
-                    lessons: [],
-                    technicalCards: [],
-                    assessments: [],
-                    tools: []
-                },
-                'presence-view': {
-                    title: 'عالم البرنامج الحضوري',
-                    subtitle: 'الفضاء البيداغوجي الخاص بالتكوين الحضوري النظامي',
-                    breadcrumb: '🏠 الرئيسية ← البرنامج الحضوري',
-                    backTo: 'main-view',
-                    units: [],
-                    lessons: [],
-                    technicalCards: [],
-                    assessments: [],
-                    tools: []
-                },
-                'homemaker-view': {
-                    title: 'برنامج المرأة الماكثة بالبيت',
-                    subtitle: 'التخصصات الفرعية المعتمدة للمسار',
-                    breadcrumb: '🏠 الرئيسية ← برنامج المرأة الماكثة بالبيت',
-                    backTo: 'main-view',
-                    isParent: true,
-                    children: [
-                        { id: 'traditional-view', icon: '🍰', title: 'الحلويات التقليدية', desc: 'الفضاء المتخصص في تراث الحلويات التقليدية وأصالتها.', className: 'homemaker' },
-                        { id: 'eastern-view', icon: '🧁', title: 'الحلويات الشرقية', desc: 'الفضاء المتخصص في الحلويات الشرقية وتقنياتها.', className: 'homemaker' },
-                        { id: 'western-view', icon: '🥐', title: 'الحلويات الغربية', desc: 'الفضاء المتخصص في الحلويات الغربية وتقنيات العجين الفاخر.', className: 'homemaker' }
+# هيكل البيانات الافتراضي الشامل
+DEFAULT_DATA = {
+    "settings": {
+        "platform_name": "المنصة البيداغوجية للتكوين المهني (APC)",
+        "admin_password": "admin",
+        "supervisor_name": "إشراف الأستاذة: فرحي حورية"
+    },
+    "programs": [
+        {
+            "id": "prog_default_1",
+            "name": "برنامج تخصص صناعة الحلويات الراقية",
+            "description": "البرنامج البيداغوجي الأساسي لتكوين صانع حلويات محترف.",
+            "units": [
+                {
+                    "id": "unit_default_1",
+                    "name": "الوحدة الأولى: أساسيات العجائن والكريمات",
+                    "lessons": [
+                        {
+                            "id": "lesson_default_1",
+                            "name": "درس العجائن الأساسية (Pâte Sucrée & Pâte à Choux)",
+                            "content": "شرح مفصل لطرق تحضير العجائن الفنية ودرجات حرارة الخبز.",
+                            "objectives": "التمكن من تحضير العجائن الفنية الأساسية بدقة.",
+                            "competencies": "فهم تفاعلات المكونات ودورها الهيكلي.",
+                            "pedagogy": "المقاربة بالمجالات والتطبيق العملي المباشر.",
+                            "steps": "1. وزن المواد بدقة. 2. تطشير الزبدة. 3. المزج والتشكيل.",
+                            "evaluation": "اختبار تطبيقي تقييمي للخبز واللون.",
+                            "technical_sheets": [
+                                {
+                                    "id": "ts_default_1",
+                                    "title": "البطاقة التقنية: Pâte Sucrée au Cacao",
+                                    "category": "عجائن",
+                                    "ingredients_list": "زبدة، سكر بودرة، بيض، طحين، كاكاو",
+                                    "quantities": "250g زبدة، 100g سكر، 1 بيضة، 400g طحين",
+                                    "steps": "مزج المادة الدسمة مع السكر، إضافة البيض، ثم الطحين.",
+                                    "temperature": "170°C",
+                                    "bake_time": "20 دقيقة",
+                                    "prep_time": "30 دقيقة",
+                                    "equipment": "خلاط، ورقة خبز، ميزان دقيق",
+                                    "success_criteria": "قوام متجانس، هش وخالٍ من التشققات",
+                                    "common_errors": "العجن المفرط المؤدي لتطوير الغلوتين",
+                                    "hygiene_rules": "ارتداء قفازات وغطاء الرأس، التبريد المستمر",
+                                    "notes": "يفضل تبريد العجينة لمدة ساعة قبل الفرد."
+                                }
+                            ],
+                            "recipes": [
+                                {
+                                    "id": "rec_default_1",
+                                    "name": "وصفة تارت الشوكولاتة الفاخرة",
+                                    "ingredients": "قاعدة Pâte Sucrée، قاناش الشوكولاتة",
+                                    "quantities": "حسب البطاقة التقنية لكل مكون",
+                                    "steps": "خبز القاعدة أعمى، صب الحشوة، والتبريد.",
+                                    "prep_time": "45 دقيقة",
+                                    "bake_time": "20 دقيقة",
+                                    "temperature": "170°C",
+                                    "servings": "8 حصص",
+                                    "notes": "تزين بالبندق المحمص."
+                                }
+                            ]
+                        }
                     ]
-                },
-                'traditional-view': {
-                    title: 'عالم الحلويات التقليدية',
-                    subtitle: 'التخصص البيداغوجي للحلويات التقليدية',
-                    breadcrumb: '🏠 الرئيسية ← برنامج المرأة الماكثة بالبيت ← الحلويات التقليدية',
-                    backTo: 'homemaker-view',
-                    lessons: [],
-                    technicalCards: [],
-                    assessments: []
-                },
-                'eastern-view': {
-                    title: 'عالم الحلويات الشرقية',
-                    subtitle: 'التخصص البيداغوجي للحلويات الشرقية',
-                    breadcrumb: '🏠 الرئيسية ← برنامج المرأة الماكثة بالبيت ← الحلويات الشرقية',
-                    backTo: 'homemaker-view',
-                    lessons: [],
-                    technicalCards: [],
-                    assessments: []
-                },
-                'western-view': {
-                    title: 'عالم الحلويات الغربية',
-                    subtitle: 'التخصص البيداغوجي للحلويات الغربية',
-                    breadcrumb: '🏠 الرئيسية ← برنامج المرأة الماكثة بالبيت ← الحلويات الغربية',
-                    backTo: 'homemaker-view',
-                    lessons: [],
-                    technicalCards: [],
-                    assessments: []
                 }
-            }
-        };
+            ]
+        }
+    ],
+    "exams": [
+        {
+            "id": "exam_default_1",
+            "title": "الامتحان التطبيقي في العجائن والتقنيات الأساسية",
+            "program_id": "prog_default_1",
+            "unit_id": "unit_default_1",
+            "lesson_id": "lesson_default_1",
+            "questions": [
+                {
+                    "id": "q_default_1",
+                    "text": "ما هي الفائدة الأساسية من إضافة السكر أو البودرة في Pâte Sucrée؟",
+                    "type": "mcq",
+                    "options": ["الحصول على قوام مقرمش ومتجانس", "زيادة نسبة الرطوبة", "منع تضاعف الحجم"],
+                    "answer": 0,
+                    "points": 5
+                },
+                {
+                    "id": "q_default_2",
+                    "text": "يتم عجن العجينة المكسورة لفترة طويلة لتطوير مادة الغلوتين.",
+                    "type": "true_false",
+                    "options": ["خطأ", "صحيح"],
+                    "answer": 0,
+                    "points": 5
+                }
+            ]
+        }
+    ],
+    "results": [],
+    "documents": []
+}
 
-        /**
-         * =========================================================================
-         * محرك العرض الديناميكي (Dynamic Rendering Engine)
-         * =========================================================================
-         */
-        function buildCard(item) {
-            return `
-                <div class="card ${item.className || ''}" tabindex="0" role="button" 
-                     onclick="switchView('${item.id}')" 
-                     onkeydown="if(event.key==='Enter') switchView('${item.id}')">
-                    <div class="card-icon">${item.icon}</div>
-                    <h3>${item.title}</h3>
-                    <p>${item.desc}</p>
-                    <button class="btn-entry">دخول العالم</button>
+# دوال البيانات الآمنة مع المعالجة الهندسية للتحقق والتوافق
+def load_data():
+    if not os.path.exists(DATA_FILE):
+        save_data(DEFAULT_DATA)
+        return DEFAULT_DATA
+    try:
+        with open(DATA_FILE, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            if not isinstance(data, dict):
+                return DEFAULT_DATA
+            for key in DEFAULT_DATA:
+                if key not in data:
+                    data[key] = DEFAULT_DATA[key]
+            if "settings" not in data or not isinstance(data["settings"], dict):
+                data["settings"] = DEFAULT_DATA["settings"]
+            else:
+                for skey in DEFAULT_DATA["settings"]:
+                    if skey not in data["settings"]:
+                        data["settings"][skey] = DEFAULT_DATA["settings"][skey]
+            return data
+    except Exception:
+        return DEFAULT_DATA
+
+def save_data(data):
+    temp_file = DATA_FILE + ".tmp"
+    try:
+        with open(temp_file, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=4)
+        if os.path.exists(DATA_FILE):
+            os.replace(temp_file, DATA_FILE)
+        else:
+            os.rename(temp_file, DATA_FILE)
+    except Exception as e:
+        st.error(f"حدث خطأ أثناء حفظ البيانات: {e}")
+
+# تهيئة Session State
+if "db" not in st.session_state:
+    st.session_state.db = load_data()
+
+if "is_admin" not in st.session_state:
+    st.session_state.is_admin = False
+
+if "current_view" not in st.session_state:
+    st.session_state.current_view = "home"
+
+if "selected_program_id" not in st.session_state:
+    st.session_state.selected_program_id = None
+
+if "selected_unit_id" not in st.session_state:
+    st.session_state.selected_unit_id = None
+
+if "selected_lesson_id" not in st.session_state:
+    st.session_state.selected_lesson_id = None
+
+if "active_exam_id" not in st.session_state:
+    st.session_state.active_exam_id = None
+
+db = st.session_state.db
+
+# التصميم والهوية البصرية (RTL + CSS متوافق)
+st.markdown("""
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap');
+    html, body, [class*="css"] {
+        font-family: 'Cairo', sans-serif;
+        direction: rtl;
+        text-align: right;
+    }
+    .card-custom {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .supervisor-badge {
+        background: #f1f5f9;
+        padding: 8px 15px;
+        border-radius: 8px;
+        color: #1e293b;
+        font-weight: 600;
+        margin-bottom: 20px;
+        border-right: 4px solid #2563eb;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# شريط التنقل العلوي والإشراف
+col_title, col_nav1, col_nav2, col_nav3, col_nav4 = st.columns([2, 1, 1, 1, 1])
+with col_title:
+    platform_title = db.get("settings", {}).get("platform_name", "المنصة البيداغوجية للتكوين المهني (APC)")
+    st.markdown(f"### 🥐 {platform_title}")
+with col_nav1:
+    if st.button("🏠 الرئيسية", key="top_nav_home"):
+        st.session_state.current_view = "home"
+        st.rerun()
+with col_nav2:
+    if st.button("🔍 البحث الشامل", key="top_nav_search"):
+        st.session_state.current_view = "search"
+        st.rerun()
+with col_nav3:
+    if st.button("📝 الامتحانات", key="top_nav_exams"):
+        st.session_state.current_view = "exams"
+        st.rerun()
+with col_nav4:
+    if st.session_state.is_admin:
+        if st.button("🚪 خروج المدير", key="top_nav_logout"):
+            st.session_state.is_admin = False
+            st.session_state.current_view = "home"
+            st.rerun()
+    else:
+        if st.button("🔐 دخول الإدارة", key="top_nav_login"):
+            st.session_state.current_view = "admin_login"
+            st.rerun()
+
+supervisor_text = db.get("settings", {}).get("supervisor_name", "إشراف الأستاذة: فرحي حورية")
+st.markdown(f'<div class="supervisor-badge">✨ {supervisor_text}</div>', unsafe_allow_html=True)
+st.markdown("---")
+
+# ---------------------------------------------------------
+# 1. تسجيل دخول الإدارة
+# ---------------------------------------------------------
+if st.session_state.current_view == "admin_login":
+    st.subheader("تسجيل دخول المشرف (الإدارة)")
+    pwd = st.text_input("كلمة المرور", type="password", key="admin_pwd_input")
+    if st.button("دخول", key="admin_login_submit"):
+        admin_pass = db.get("settings", {}).get("admin_password", "admin")
+        if pwd == admin_pass:
+            st.session_state.is_admin = True
+            st.session_state.current_view = "admin_dashboard"
+            st.success("تم تسجيل الدخول بنجاح!")
+            st.rerun()
+        else:
+            st.error("كلمة المرور غير صحيحة.")
+
+# ---------------------------------------------------------
+# 2. لوحة الإدارة الشاملة
+# ---------------------------------------------------------
+elif st.session_state.current_view == "admin_dashboard":
+    if not st.session_state.is_admin:
+        st.warning("يرجى تسجيل الدخول أولاً.")
+        st.session_state.current_view = "home"
+        st.rerun()
+    
+    st.header("⚙️ لوحة التحكم والإدارة الشاملة للمنصة")
+    
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
+        "البرامج والوحدات", "الدروس", "البطاقات التقنية", "الوصفات", "الامتحانات والأسئلة", "الوثائق والنتائج", "الإعدادات"
+    ])
+    
+    with tab1:
+        st.subheader("إدارة البرامج والوحدات")
+        with st.form("add_prog_form"):
+            p_name = st.text_input("اسم البرنامج الجديد")
+            p_desc = st.text_area("وصف البرنامج")
+            if st.form_submit_button("إضافة البرنامج") and p_name:
+                db["programs"].append({
+                    "id": f"prog_{uuid.uuid4().hex[:8]}",
+                    "name": p_name,
+                    "description": p_desc,
+                    "units": []
+                })
+                save_data(db)
+                st.success("تم إضافة البرنامج بنجاح!")
+                st.rerun()
+        
+        st.markdown("---")
+        if db["programs"]:
+            p_sel = st.selectbox("اختر البرنامج لإدارة وحداته", [p["id"] for p in db["programs"]], format_func=lambda x: next((p["name"] for p in db["programs"] if p["id"] == x), x), key="admin_prog_select")
+            prog_obj = next((p for p in db["programs"] if p["id"] == p_sel), None)
+            
+            if prog_obj:
+                with st.form("add_unit_form"):
+                    u_name = st.text_input("اسم الوحدة الجديدة")
+                    if st.form_submit_button("إضافة الوحدة") and u_name:
+                        prog_obj["units"].append({
+                            "id": f"unit_{uuid.uuid4().hex[:8]}",
+                            "name": u_name,
+                            "lessons": []
+                        })
+                        save_data(db)
+                        st.success("تم إضافة الوحدة بنجاح!")
+                        st.rerun()
+                
+                st.markdown("### الوحدات الحالية وتعديلها:")
+                for idx, u in enumerate(list(prog_obj["units"])):
+                    col_u1, col_u2 = st.columns([3, 1])
+                    with col_u1:
+                        new_u_name = st.text_input(f"تعديل اسم الوحدة {idx+1}", value=u["name"], key=f"edit_u_{u['id']}")
+                        if new_u_name != u["name"]:
+                            u["name"] = new_u_name
+                            save_data(db)
+                    with col_u2:
+                        if st.button("حذف الوحدة", key=f"del_u_{u['id']}"):
+                            prog_obj["units"].remove(u)
+                            save_data(db)
+                            st.rerun()
+
+    with tab2:
+        st.subheader("إدارة الدروس بالتفصيل البيداغوجي")
+        if db["programs"]:
+            p_choice = st.selectbox("اختر البرنامج للدرس", db["programs"], format_func=lambda x: x["name"], key="l_p_admin")
+            if p_choice.get("units"):
+                u_choice = st.selectbox("اختر الوحدة", p_choice["units"], format_func=lambda x: x["name"], key="l_u_admin")
+                
+                with st.form("add_lesson_full"):
+                    l_name = st.text_input("عنوان الدرس")
+                    l_content = st.text_area("المحتوى المفصل للدرس")
+                    l_obj = st.text_area("أهداف الدرس")
+                    l_comp = st.text_area("الكفاءات المستهدفة")
+                    l_ped = st.text_area("المقاربة البيداغوجية")
+                    l_steps = st.text_area("خطوات الإنجاز")
+                    l_eval = st.text_area("طريقة التقييم")
+                    
+                    if st.form_submit_button("حفظ وإضافة الدرس") and l_name:
+                        u_choice["lessons"].append({
+                            "id": f"lesson_{uuid.uuid4().hex[:8]}",
+                            "name": l_name,
+                            "content": l_content,
+                            "objectives": l_obj,
+                            "competencies": l_comp,
+                            "pedagogy": l_ped,
+                            "steps": l_steps,
+                            "evaluation": l_eval,
+                            "technical_sheets": [],
+                            "recipes": []
+                        })
+                        save_data(db)
+                        st.success("تم إضافة الدرس بنجاح!")
+                        st.rerun()
+            else:
+                st.info("الرجاء إضافة وحدة لهذا البرنامج أولاً.")
+        else:
+            st.info("الرجاء إضافة برنامج أولاً.")
+
+    with tab3:
+        st.subheader("إدارة البطاقات التقنية الكاملة")
+        all_lessons = []
+        for p in db["programs"]:
+            for u in p.get("units", []):
+                for l in u.get("lessons", []):
+                    all_lessons.append((f"{p['name']} > {u['name']} > {l['name']}", p, u, l))
+        
+        if all_lessons:
+            les_sel = st.selectbox("اختر الدرس المرتبط بالبطاقة التقنية", all_lessons, format_func=lambda x: x[0], key="ts_les_select")
+            p_obj, u_obj, l_obj = les_sel[1], les_sel[2], les_sel[3]
+            
+            with st.form("add_tech_sheet_form"):
+                ts_title = st.text_input("اسم البطاقة التقنية")
+                ts_cat = st.text_input("الصنف (مثال: عجائن، كريمات، معجنات)")
+                ts_ing = st.text_area("المكونات")
+                ts_qty = st.text_area("الكميات والوحدات")
+                ts_steps = st.text_area("خطوات التحضير")
+                ts_temp = st.text_input("درجة الحرارة (مثال: 180°C)")
+                ts_bake = st.text_input("وقت الطهي")
+                ts_prep = st.text_input("وقت التحضير")
+                ts_eq = st.text_area("المعدات المطلوبة")
+                ts_succ = st.text_area("معايير النجاح")
+                ts_err = st.text_area("الأخطاء الشائعة")
+                ts_hyg = st.text_area("قواعد النظافة والسلامة")
+                ts_notes = st.text_area("ملاحظات إضافية")
+                
+                if st.form_submit_button("حفظ البطاقة التقنية") and ts_title:
+                    if "technical_sheets" not in l_obj:
+                        l_obj["technical_sheets"] = []
+                    l_obj["technical_sheets"].append({
+                        "id": f"ts_{uuid.uuid4().hex[:8]}",
+                        "title": ts_title,
+                        "category": ts_cat,
+                        "ingredients_list": ts_ing,
+                        "quantities": ts_qty,
+                        "steps": ts_steps,
+                        "temperature": ts_temp,
+                        "bake_time": ts_bake,
+                        "prep_time": ts_prep,
+                        "equipment": ts_eq,
+                        "success_criteria": ts_succ,
+                        "common_errors": ts_err,
+                        "hygiene_rules": ts_hyg,
+                        "notes": ts_notes
+                    })
+                    save_data(db)
+                    st.success("تم إضافة البطاقة التقنية بنجاح!")
+                    st.rerun()
+        else:
+            st.info("يجب إضافة درس واحد على الأقل أولاً.")
+
+    with tab4:
+        st.subheader("إدارة الوصفات الفنية الكاملة")
+        if all_lessons:
+            les_sel_r = st.selectbox("اختر الدرس المرتبط بالوصفة", all_lessons, format_func=lambda x: x[0], key="rec_les_select")
+            p_o, u_o, l_o = les_sel_r[1], les_sel_r[2], les_sel_r[3]
+            
+            with st.form("add_recipe_form"):
+                rec_name = st.text_input("اسم الوصفة")
+                rec_ing = st.text_area("المكونات الأساسية")
+                rec_qty = st.text_area("الكميات الدقيقة")
+                rec_steps = st.text_area("طريقة التحضير")
+                rec_prep = st.text_input("مدة التحضير")
+                rec_bake = st.text_input("مدة الطهي")
+                rec_temp = st.text_input("درجة الحرارة")
+                rec_serv = st.text_input("عدد الحصص")
+                rec_notes = st.text_area("نصائح وملاحظات")
+                
+                if st.form_submit_button("حفظ الوصفة") and rec_name:
+                    if "recipes" not in l_o:
+                        l_o["recipes"] = []
+                    l_o["recipes"].append({
+                        "id": f"rec_{uuid.uuid4().hex[:8]}",
+                        "name": rec_name,
+                        "ingredients": rec_ing,
+                        "quantities": rec_qty,
+                        "steps": rec_steps,
+                        "prep_time": rec_prep,
+                        "bake_time": rec_bake,
+                        "temperature": rec_temp,
+                        "servings": rec_serv,
+                        "notes": rec_notes
+                    })
+                    save_data(db)
+                    st.success("تم إضافة الوصفة بنجاح!")
+                    st.rerun()
+        else:
+            st.info("يجب إضافة درس واحد على الأقل أولاً.")
+
+    with tab5:
+        st.subheader("إدارة الامتحانات والأسئلة الشاملة")
+        with st.form("create_exam_admin"):
+            ex_title = st.text_input("عنوان الامتحان")
+            if all_lessons:
+                ex_les = st.selectbox("ربط الامتحان بالدرس", all_lessons, format_func=lambda x: x[0], key="ex_les_select")
+                if st.form_submit_button("إنشاء الامتحان") and ex_title:
+                    db["exams"].append({
+                        "id": f"exam_{uuid.uuid4().hex[:8]}",
+                        "title": ex_title,
+                        "program_id": ex_les[1]["id"],
+                        "unit_id": ex_les[2]["id"],
+                        "lesson_id": ex_les[3]["id"],
+                        "questions": []
+                    })
+                    save_data(db)
+                    st.success("تم إنشاء الامتحان بنجاح!")
+                    st.rerun()
+            else:
+                st.warning("أضف دروساً أولاً.")
+
+        st.markdown("---")
+        if db["exams"]:
+            sel_ex_q = st.selectbox("اختر الامتحان لإضافة الأسئلة إليه", db["exams"], format_func=lambda x: x["title"], key="ex_q_select")
+            with st.form("add_q_form"):
+                q_txt = st.text_input("نص السؤال")
+                q_type = st.selectbox("نوع السؤال", ["mcq", "true_false"], format_func=lambda x: "اختيار من متعدد" if x=="mcq" else "صح / خطأ")
+                if q_type == "mcq":
+                    opt1 = st.text_input("الخيار 1", "الخيار أ")
+                    opt2 = st.text_input("الخيار 2", "الخيار ب")
+                    opt3 = st.text_input("الخيار 3", "الخيار ج")
+                    options = [opt1, opt2, opt3]
+                    corr = st.number_input("رقم الإجابة الصحيحة (0، 1، 2)", min_value=0, max_value=2, value=0)
+                else:
+                    options = ["خطأ", "صحيح"]
+                    corr = st.selectbox("الإجابة الصحيحة", [0, 1], format_func=lambda x: options[x], key="tf_corr_select")
+                
+                pts = st.number_input("النقاط", min_value=1, value=5)
+                if st.form_submit_button("إضافة السؤال") and q_txt:
+                    if "questions" not in sel_ex_q:
+                        sel_ex_q["questions"] = []
+                    sel_ex_q["questions"].append({
+                        "id": f"q_{uuid.uuid4().hex[:8]}",
+                        "text": q_txt,
+                        "type": q_type,
+                        "options": options,
+                        "answer": int(corr),
+                        "points": int(pts)
+                    })
+                    save_data(db)
+                    st.success("تم إضافة السؤال بنجاح!")
+                    st.rerun()
+
+    with tab6:
+        st.subheader("إدارة الوثائق والملفات ونتائج المتربصين")
+        uploaded_file = st.file_uploader("رفع ملف جديد (PDF, DOCX, XLSX, PPTX, PNG, JPG, JPEG)", type=["pdf", "docx", "xlsx", "pptx", "png", "jpg", "jpeg"])
+        if uploaded_file is not None:
+            file_ext = os.path.splitext(uploaded_file.name)[1]
+            safe_filename = f"{uuid.uuid4().hex[:8]}{file_ext}"
+            file_path = os.path.join(UPLOADS_DIR, safe_filename)
+            with open(file_path, "wb") as f:
+                f.write(uploaded_file.getbuffer())
+            
+            if "documents" not in db:
+                db["documents"] = []
+            db["documents"].append({
+                "id": f"doc_{uuid.uuid4().hex[:8]}",
+                "title": uploaded_file.name,
+                "name": safe_filename,
+                "path": file_path,
+                "date": datetime.now().strftime("%Y-%m-%d %H:%M")
+            })
+            save_data(db)
+            st.success("تم رفع الملف بنجاح!")
+            st.rerun()
+        
+        st.markdown("### الملفات المرفوعة:")
+        for doc in list(db.get("documents", [])):
+            col_d1, col_d2 = st.columns([3, 1])
+            with col_d1:
+                st.write(f"📄 {doc.get('title', 'ملف بدون عنوان')} (رفع في: {doc.get('date', 'غير محدد')})")
+            with col_d2:
+                if st.button("حذف الملف", key=f"del_doc_{doc['id']}"):
+                    path_to_rm = doc.get("path")
+                    if path_to_rm and os.path.exists(path_to_rm):
+                        try:
+                            os.remove(path_to_rm)
+                        except Exception:
+                            pass
+                    db["documents"].remove(doc)
+                    save_data(db)
+                    st.rerun()
+        
+        st.markdown("---")
+        st.subheader("📊 نتائج الامتحانات المسجلة للمتربصين:")
+        if db.get("results"):
+            for res in db["results"]:
+                res_id = res.get("id", "res_old")
+                st.markdown(f"""
+                <div class="card-custom">
+                    <b>المتربص:</b> {res.get('student_name', '')} | <b>الامتحان:</b> {res.get('exam_title', '')} | <b>التاريخ:</b> {res.get('date', '')}<br>
+                    <b>النقطة:</b> {res.get('score', 0)} / {res.get('total', 0)} ({res.get('percentage', 0)}%) - <b>الحالة:</b> {res.get('status', '')}
                 </div>
-            `;
-        }
+                """, unsafe_allow_html=True)
+        else:
+            st.info("لا توجد نتائج مسجلة حتى الآن.")
 
-        function renderMainView() {
-            const main = platformData.main;
-            let cardsHtml = main.children.map(child => buildCard(child)).join('');
-            return `
-                <div id="main-view" class="view-section active">
-                    <div class="section-title">
-                        <h2>${main.title}</h2>
-                        <p>${main.subtitle}</p>
-                    </div>
-                    <div class="grid-cards">${cardsHtml}</div>
+    with tab7:
+        st.subheader("إعدادات المنصة")
+        p_name_new = st.text_input("اسم المنصة", value=db.get("settings", {}).get("platform_name", ""))
+        sup_name_new = st.text_input("نص الإشراف", value=db.get("settings", {}).get("supervisor_name", ""))
+        pwd_new = st.text_input("كلمة مرور الإدارة الجديدة", type="password", key="settings_new_pwd")
+        if st.button("حفظ التغييرات", key="save_settings_btn"):
+            if "settings" not in db:
+                db["settings"] = {}
+            db["settings"]["platform_name"] = p_name_new
+            db["settings"]["supervisor_name"] = sup_name_new
+            if pwd_new:
+                db["settings"]["admin_password"] = pwd_new
+            save_data(db)
+            st.success("تم حفظ الإعدادات بنجاح!")
+            st.rerun()
+
+# ---------------------------------------------------------
+# 3. نظام البحث الشامل
+# ---------------------------------------------------------
+elif st.session_state.current_view == "search":
+    st.header("🔍 البحث الشامل في محتوى المنصة")
+    query = st.text_input("أدخل كلمة البحث للوصول المباشر", key="global_search_input").strip().lower()
+    
+    if query:
+        found = False
+        for p in db.get("programs", []):
+            if query in p.get("name", "").lower() or query in p.get("description", "").lower():
+                found = True
+                st.info(f"📁 برنامج: {p.get('name', '')}")
+                if st.button("انتقل للبرنامج", key=f"s_p_{p['id']}"):
+                    st.session_state.selected_program_id = p["id"]
+                    st.session_state.current_view = "program_view"
+                    st.rerun()
+            
+            for u in p.get("units", []):
+                if query in u.get("name", "").lower():
+                    found = True
+                    st.success(f"📂 وحدة: {u.get('name', '')} (تابعة لـ {p.get('name', '')})")
+                
+                for l in u.get("lessons", []):
+                    match_lesson = (
+                        query in l.get("name", "").lower() or
+                        query in l.get("content", "").lower() or
+                        query in l.get("objectives", "").lower() or
+                        query in l.get("competencies", "").lower() or
+                        query in l.get("pedagogy", "").lower() or
+                        query in l.get("steps", "").lower() or
+                        query in l.get("evaluation", "").lower()
+                    )
+                    if match_lesson:
+                        found = True
+                        st.warning(f"📖 درس: {l.get('name', '')}")
+                        if st.button("فتح الدرس مباشرة", key=f"s_l_{l['id']}"):
+                            st.session_state.selected_program_id = p["id"]
+                            st.session_state.selected_unit_id = u["id"]
+                            st.session_state.selected_lesson_id = l["id"]
+                            st.session_state.current_view = "lesson_view"
+                            st.rerun()
+                    
+                    for ts in l.get("technical_sheets", []):
+                        match_ts = (
+                            query in ts.get("title", "").lower() or
+                            query in ts.get("category", "").lower() or
+                            query in ts.get("ingredients_list", "").lower() or
+                            query in ts.get("quantities", "").lower() or
+                            query in ts.get("equipment", "").lower()
+                        )
+                        if match_ts:
+                            found = True
+                            st.info(f"📋 بطاقة تقنية: {ts.get('title', '')} (مرتبطة بدرس: {l.get('name', '')})")
+                            if st.button("عرض الدرس والبطاقة", key=f"s_ts_{ts['id']}"):
+                                st.session_state.selected_program_id = p["id"]
+                                st.session_state.selected_unit_id = u["id"]
+                                st.session_state.selected_lesson_id = l["id"]
+                                st.session_state.current_view = "lesson_view"
+                                st.rerun()
+                    
+                    for rec in l.get("recipes", []):
+                        match_rec = (
+                            query in rec.get("name", "").lower() or
+                            query in rec.get("ingredients", "").lower() or
+                            query in rec.get("quantities", "").lower()
+                        )
+                        if match_rec:
+                            found = True
+                            st.success(f"🧁 وصفة: {rec.get('name', '')} (مرتبطة بدرس: {l.get('name', '')})")
+
+        for doc in db.get("documents", []):
+            if query in doc.get("title", "").lower() or query in doc.get("name", "").lower():
+                found = True
+                st.info(f"📄 وثيقة: {doc.get('title', '')}")
+                doc_path = doc.get("path")
+                if doc_path and os.path.exists(doc_path):
+                    with open(doc_path, "rb") as f:
+                        st.download_button("تنزيل الوثيقة", f, file_name=doc.get("title", "document"), key=f"dl_search_{doc['id']}")
+
+        if not found:
+            st.warning("لم يتم العثور على نتائج تطابق بحثك.")
+
+# ---------------------------------------------------------
+# 4. نظام الامتحانات للمتربصين
+# ---------------------------------------------------------
+elif st.session_state.current_view == "exams":
+    st.header("📝 الامتحانات المتاحة للمتربصين")
+    if not db.get("exams"):
+        st.info("لا توجد امتحانات متاحة حالياً.")
+    else:
+        for ex in db["exams"]:
+            q_count = len(ex.get("questions", []))
+            st.markdown(f"""
+            <div class="card-custom">
+                <h4>{ex.get('title', 'امتحان بدون عنوان')}</h4>
+                <p>عدد الأسئلة: {q_count}</p>
+            </div>
+            """, unsafe_allow_html=True)
+            if q_count > 0:
+                if st.button(f"ابدأ الامتحان: {ex.get('title', '')}", key=f"start_ex_{ex['id']}"):
+                    st.session_state.active_exam_id = ex["id"]
+                    st.session_state.current_view = "exam_session"
+                    st.rerun()
+            else:
+                st.warning("هذا الامتحان لا يحتوي على أسئلة حالياً.")
+
+elif st.session_state.current_view == "exam_session":
+    ex_obj = next((e for e in db.get("exams", []) if e["id"] == st.session_state.active_exam_id), None)
+    if not ex_obj or not ex_obj.get("questions"):
+        st.error("الامتحان غير موجود أو لا يحتوي على أسئلة.")
+        st.session_state.current_view = "exams"
+        st.rerun()
+    
+    st.header(f"📝 امتحان: {ex_obj.get('title', '')}")
+    student_name = st.text_input("اسم المتربص الثلاثي:", key="exam_student_name_input")
+    
+    with st.form("exam_form_sub"):
+        answers = {}
+        for idx, q in enumerate(ex_obj.get("questions", [])):
+            st.markdown(f"**السؤال {idx+1}: {q.get('text', '')}** (النقاط: {q.get('points', 5)})")
+            options = q.get("options", ["خطأ", "صحيح"])
+            ans = st.radio("اختر الإجابة:", list(range(len(options))), format_func=lambda x: options[x], key=f"ans_{q.get('id', idx)}")
+            answers[q.get('id', idx)] = ans
+            st.markdown("---")
+            
+        if st.form_submit_button("إرسال الإجابات والحصول على النتيجة"):
+            if not student_name.strip():
+                st.error("يرجى إدخال اسم المتربص أولاً.")
+            else:
+                score = 0
+                questions_list = ex_obj.get("questions", [])
+                total = sum(q.get("points", 5) for q in questions_list)
+                for q in questions_list:
+                    if answers.get(q.get("id")) == q.get("answer"):
+                        score += q.get("points", 5)
+                
+                percentage = round((score / total) * 100, 2) if total > 0 else 0
+                status = "ناجح ✨" if percentage >= 50 else "راسب (يحتاج لإعادة المحاولة)"
+                
+                if "results" not in db:
+                    db["results"] = []
+                db["results"].append({
+                    "id": f"res_{uuid.uuid4().hex[:8]}",
+                    "student_name": student_name,
+                    "exam_title": ex_obj.get("title", ""),
+                    "score": score,
+                    "total": total,
+                    "percentage": percentage,
+                    "status": status,
+                    "date": datetime.now().strftime("%Y-%m-%d %H:%M")
+                })
+                save_data(db)
+                
+                st.success(f"🎉 النتيجة النهائية للمتربص {student_name}: {score} / {total} ({percentage}%) - {status}")
+                if st.button("العودة لقائمة الامتحانات", key="back_to_exams_after_res"):
+                    st.session_state.current_view = "exams"
+                    st.rerun()
+
+# ---------------------------------------------------------
+# 5. التنقل الهرمي للبرامج والدروس والبطاقات
+# ---------------------------------------------------------
+elif st.session_state.current_view == "home":
+    st.header("🌟 برامج التكوين المهني في فنون الطهي وصناعة الحلويات")
+    st.markdown("اختر البرنامج المناسب لبدء التصفح الهرمي:")
+    
+    if not db.get("programs"):
+        st.info("لا توجد برامج متاحة حالياً.")
+    else:
+        for p in db["programs"]:
+            st.markdown(f"""
+            <div class="card-custom">
+                <h3>📁 {p.get('name', '')}</h3>
+                <p>{p.get('description', '')}</p>
+            </div>
+            """, unsafe_allow_html=True)
+            if st.button(f"استعراض وحدات البرنامج: {p.get('name', '')}", key=f"p_btn_{p['id']}"):
+                st.session_state.selected_program_id = p["id"]
+                st.session_state.current_view = "program_view"
+                st.rerun()
+
+elif st.session_state.current_view == "program_view":
+    prog = next((p for p in db.get("programs", []) if p["id"] == st.session_state.selected_program_id), None)
+    if prog:
+        st.header(f"📁 البرنامج: {prog.get('name', '')}")
+        if st.button("← العودة للبرامج الرئيسية", key="back_home_btn"):
+            st.session_state.current_view = "home"
+            st.rerun()
+            
+        st.markdown("---")
+        if not prog.get("units"):
+            st.info("لا توجد وحدات في هذا البرنامج.")
+        else:
+            for u in prog["units"]:
+                st.subheader(f"📂 الوحدة: {u.get('name', '')}")
+                if u.get("lessons"):
+                    for l in u["lessons"]:
+                        col_l1, col_l2 = st.columns([3, 1])
+                        with col_l1:
+                            st.write(f"📖 درس: **{l.get('name', '')}**")
+                        with col_l2:
+                            if st.button("فتح الدرس والبطاقات", key=f"open_l_{l['id']}"):
+                                st.session_state.selected_unit_id = u["id"]
+                                st.session_state.selected_lesson_id = l["id"]
+                                st.session_state.current_view = "lesson_view"
+                                st.rerun()
+                else:
+                    st.write("لا توجد دروس مضافة في هذه الوحدة.")
+
+elif st.session_state.current_view == "lesson_view":
+    prog = next((p for p in db.get("programs", []) if p["id"] == st.session_state.selected_program_id), None)
+    unit = next((u for u in prog.get("units", []) if u["id"] == st.session_state.selected_unit_id), None) if prog else None
+    lesson = next((l for l in unit.get("lessons", []) if l["id"] == st.session_state.selected_lesson_id), None) if unit else None
+    
+    if lesson:
+        st.header(f"📖 الدرس: {lesson.get('name', '')}")
+        if st.button("← العودة للوحدة السابقة", key="back_prog_btn"):
+            st.session_state.current_view = "program_view"
+            st.rerun()
+            
+        st.markdown(f"""
+        <div class="card-custom">
+            <h4>🎯 الأهداف البيداغوجية</h4>
+            <p>{lesson.get('objectives', 'غير محدد')}</p>
+            <h4>🧠 الكفاءات المستهدفة</h4>
+            <p>{lesson.get('competencies', 'غير محدد')}</p>
+            <h4>📐 المقاربة البيداغوجية</h4>
+            <p>{lesson.get('pedagogy', 'غير محدد')}</p>
+            <h4>📝 محتوى الشرح المفصل</h4>
+            <p>{lesson.get('content', 'غير محدد')}</p>
+            <h4>⚡ خطوات الإنجاز</h4>
+            <p>{lesson.get('steps', 'غير محدد')}</p>
+            <h4>📋 طريقة التقييم</h4>
+            <p>{lesson.get('evaluation', 'غير محدد')}</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        st.subheader("📋 البطاقات التقنية المرتبطة بالدرس")
+        if lesson.get("technical_sheets"):
+            for ts in lesson["technical_sheets"]:
+                st.markdown(f"""
+                <div class="card-custom">
+                    <h4>{ts.get('title', '')} ({ts.get('category', '')})</h4>
+                    <p><b>المكونات:</b> {ts.get('ingredients_list', '')}</p>
+                    <p><b>الكميات:</b> {ts.get('quantities', '')}</p>
+                    <p><b>خطوات التحضير:</b> {ts.get('steps', '')}</p>
+                    <p><b>درجة الحرارة:</b> {ts.get('temperature', '')} | <b>وقت الطهي:</b> {ts.get('bake_time', '')} | <b>وقت التحضير:</b> {ts.get('prep_time', '')}</p>
+                    <p><b>المعدات:</b> {ts.get('equipment', '')}</p>
+                    <p><b>معايير النجاح:</b> {ts.get('success_criteria', '')}</p>
+                    <p><b>الأخطاء الشائعة:</b> {ts.get('common_errors', '')}</p>
+                    <p><b>قواعد النظافة والسلامة:</b> {ts.get('hygiene_rules', '')}</p>
+                    <p><b>ملاحظات:</b> {ts.get('notes', '')}</p>
                 </div>
-            `;
-        }
-
-        function renderPageView(pageId) {
-            const page = platformData.pages[pageId];
-            if (!page) return '';
-
-            let innerHtml = '';
-            if (page.isParent && page.children) {
-                let cardsHtml = page.children.map(child => buildCard(child)).join('');
-                innerHtml = `<div class="grid-cards">${cardsHtml}</div>`;
-            } else {
-                // عرض الحاويات المعيارية الفارغة بانتظار المحتوى مستقبلاً دون تدمير الواجهة
-                innerHtml = `
-                    <div class="modular-space">
-                        <div class="empty-placeholder">
-                            هذا الفضاء جاهز هندسياً لاستقبال الوحدات، الدروس، والبطاقات التقنية فور إضافتها.
-                        </div>
-                    </div>
-                `;
-            }
-
-            let backButtonText = "⬅ العودة السابقة";
-            if (page.backTo === 'homemaker-view') {
-                backButtonText = "⬅ العودة لبرنامج المرأة الماكثة بالبيت";
-            } else if (page.backTo === 'main-view') {
-                backButtonText = "⬅ العودة للرئيسية";
-            }
-
-            return `
-                <div id="${pageId}" class="view-section">
-                    <div class="nav-controls">
-                        <div class="breadcrumb">${page.breadcrumb}</div>
-                        <div class="nav-buttons-group">
-                            <button class="btn-action" onclick="switchView('${page.backTo}')">${backButtonText}</button>
-                            <button class="btn-action btn-home" onclick="switchView('main-view')">🏠 الرئيسية</button>
-                        </div>
-                    </div>
-                    <div class="section-title">
-                        <h2>${page.title}</h2>
-                        <p>${page.subtitle}</p>
-                    </div>
-                    ${innerHtml}
+                """, unsafe_allow_html=True)
+        else:
+            st.info("لا توجد بطاقات تقنية مرتبطة بهذا الدرس.")
+            
+        st.subheader("🧁 الوصفات الفنية المرتبطة بالدرس")
+        if lesson.get("recipes"):
+            for rec in lesson["recipes"]:
+                st.markdown(f"""
+                <div class="card-custom">
+                    <h4>{rec.get('name', '')}</h4>
+                    <p><b>المكونات:</b> {rec.get('ingredients', '')}</p>
+                    <p><b>الكميات:</b> {rec.get('quantities', '')}</p>
+                    <p><b>طريقة التحضير:</b> {rec.get('steps', '')}</p>
+                    <p><b>مدة التحضير:</b> {rec.get('prep_time', '')} | <b>مدة الطهي:</b> {rec.get('bake_time', '')} | <b>الحرارة:</b> {rec.get('temperature', '')} | <b>الحصص:</b> {rec.get('servings', '')}</p>
+                    <p><b>نصائح وملاحظات:</b> {rec.get('notes', '')}</p>
                 </div>
-            `;
-        }
-
-        function renderAllViews() {
-            let html = renderMainView();
-            for (const pageId in platformData.pages) {
-                html += renderPageView(pageId);
-            }
-            document.getElementById('app-container').innerHTML = html;
-        }
-
-        function switchView(viewId) {
-            const sections = document.querySelectorAll('.view-section');
-            sections.forEach(section => section.classList.remove('active'));
-            const target = document.getElementById(viewId);
-            if (target) {
-                target.classList.add('active');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
-        }
-
-        window.onload = function() {
-            renderAllViews();
-        };
-    </script>
-
-</body>
-</html>
-"""
-
-components.html(html_code, height=750, scrolling=True)
+                """, unsafe_allow_html=True)
+        else:
+            st.info("لا توجد وصفات مرتبطة بهذا الدرس.")
