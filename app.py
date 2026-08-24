@@ -6,7 +6,7 @@ from datetime import datetime
 
 # إعدادات الصفحة
 st.set_page_config(
-    page_title="المنصة البيداغوجية للتكوين المهني (APC)",
+    title="المنصة البيداغوجية للتكوين المهني (APC)",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
@@ -18,7 +18,7 @@ UPLOADS_DIR = "uploaded_files"
 if not os.path.exists(UPLOADS_DIR):
     os.makedirs(UPLOADS_DIR, exist_ok=True)
 
-# هيكل البيانات الافتراضي الشامل
+# هيكل البيانات الافتراضي الشامل (يحتوي على البرامج الثلاثة الأساسية)
 DEFAULT_DATA = {
     "settings": {
         "platform_name": "المنصة البيداغوجية للتكوين المهني (APC)",
@@ -27,55 +27,141 @@ DEFAULT_DATA = {
     },
     "programs": [
         {
-            "id": "prog_default_1",
-            "name": "برنامج تخصص صناعة الحلويات الراقية",
-            "description": "البرنامج البيداغوجي الأساسي لتكوين صانع حلويات محترف.",
+            "id": "prog_tamheen",
+            "name": "برنامج التكوين بالتمهين",
+            "description": "البرنامج البيداغوجي الخاص بالمتربصين في صيغة التمهين المهني.",
             "units": [
                 {
-                    "id": "unit_default_1",
-                    "name": "الوحدة الأولى: أساسيات العجائن والكريمات",
+                    "id": "unit_t_1",
+                    "name": "الوحدة الأساسية للتمهين والورشات التطبيقية",
                     "lessons": [
                         {
-                            "id": "lesson_default_1",
-                            "name": "درس العجائن الأساسية (Pâte Sucrée & Pâte à Choux)",
-                            "content": "شرح مفصل لطرق تحضير العجائن الفنية ودرجات حرارة الخبز.",
-                            "objectives": "التمكن من تحضير العجائن الفنية الأساسية بدقة.",
-                            "competencies": "فهم تفاعلات المكونات ودورها الهيكلي.",
-                            "pedagogy": "المقاربة بالمجالات والتطبيق العملي المباشر.",
-                            "steps": "1. وزن المواد بدقة. 2. تطشير الزبدة. 3. المزج والتشكيل.",
-                            "evaluation": "اختبار تطبيقي تقييمي للخبز واللون.",
+                            "id": "les_t_1",
+                            "name": "قواعد العمل داخل ورشات الحلويات المهنية",
+                            "content": "التعرف على تنظيم الورشة، احترام قواعد الأمن والسلامة المهنية.",
+                            "objectives": "فهم محيط العمل المهني.",
+                            "competencies": "الانضباط والتنظيم في الورشة.",
+                            "pedagogy": "التكوين الميداني والتطبيقي.",
+                            "steps": "1. تحضير الهندام المهني. 2. تعقيم وتجهيز طاولات العمل.",
+                            "evaluation": "تقييم ميداني لسلوك المتربص.",
+                            "technical_sheets": [],
+                            "recipes": []
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "prog_houdouri",
+            "name": "برنامج التكوين الحضوري",
+            "description": "البرنامج الموجه للأفواج الحضورية داخل المؤسسة التكوينية.",
+            "units": [
+                {
+                    "id": "unit_h_1",
+                    "name": "وحدة الدروس النظرية والتطبيقية الحضورية",
+                    "lessons": [
+                        {
+                            "id": "les_h_1",
+                            "name": "دراسة المواد الأولية في صناعة الحلويات",
+                            "content": "الخصائص الفيزيائية والكيميائية للدقيق، السكريات، والمواد الدسمة.",
+                            "objectives": "معرفة دور كل مكون أساسي في الوصفة.",
+                            "competencies": "القدرة على اختيار المواد الأولية بدقة.",
+                            "pedagogy": "المحاضرة التطبيقية والتجارب المخبرية المصغرة.",
+                            "steps": "1. تصنيف المواد. 2. دراسة تأثير الحرارة عليها.",
+                            "evaluation": "اختبار كتابي وتقييم تفاعلي.",
+                            "technical_sheets": [],
+                            "recipes": []
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "prog_makatha",
+            "name": "برنامج المرأة الماكثة بالبيت",
+            "description": "برنامج تأهيلي مهني متكامل يضم تخصصات الحلويات المختلفة.",
+            "units": [
+                {
+                    "id": "unit_m_trad",
+                    "name": "حلويات تقليدية",
+                    "lessons": [
+                        {
+                            "id": "les_m_trad",
+                            "name": "ورشة الحلويات التقليدية الجزائرية العتيقة",
+                            "content": "صناعة المقروط، كعب الغزال، والحلويات المعسلة بأصولها الفنية.",
+                            "objectives": "الحفاظ على التراث الاصيل واحتراف صنعه.",
+                            "competencies": "إتقان النقش، العجن، والتعسيل الصحيح.",
+                            "pedagogy": "التعلم بالممارسة والمحاكاة المباشرة.",
+                            "steps": "1. تحضير الغرس والعجينة. 2. التشكيل والنقش. 3. الطهي والتعسيل.",
+                            "evaluation": "تقييم شكلي وتذوقي للحلويات.",
                             "technical_sheets": [
                                 {
-                                    "id": "ts_default_1",
-                                    "title": "البطاقة التقنية: Pâte Sucrée au Cacao",
-                                    "category": "عجائن",
-                                    "ingredients_list": "زبدة، سكر بودرة، بيض، طحين، كاكاو",
-                                    "quantities": "250g زبدة، 100g سكر، 1 بيضة، 400g طحين",
-                                    "steps": "مزج المادة الدسمة مع السكر، إضافة البيض، ثم الطحين.",
-                                    "temperature": "170°C",
-                                    "bake_time": "20 دقيقة",
-                                    "prep_time": "30 دقيقة",
-                                    "equipment": "خلاط، ورقة خبز، ميزان دقيق",
-                                    "success_criteria": "قوام متجانس، هش وخالٍ من التشققات",
-                                    "common_errors": "العجن المفرط المؤدي لتطوير الغلوتين",
-                                    "hygiene_rules": "ارتداء قفازات وغطاء الرأس، التبريد المستمر",
-                                    "notes": "يفضل تبريد العجينة لمدة ساعة قبل الفرد."
+                                    "id": "ts_makrood",
+                                    "title": "البطاقة التقنية: مقروط اللوز التقليدي",
+                                    "category": "حلويات تقليدية",
+                                    "ingredients_list": "لوز مطحون، سكر عادي، عطور، ماء زهر",
+                                    "quantities": "1كغ لوز، 300غ سكر، ماء زهر",
+                                    "steps": "مزج اللوز والسكر، البلل بماء الزهر، التشكيل.",
+                                    "temperature": "160°C",
+                                    "bake_time": "15 دقيقة",
+                                    "prep_time": "60 دقيقة",
+                                    "equipment": "طابع، منقاش، صواني خبز",
+                                    "success_criteria": "بقاء اللون أبيض طرياً ومنقوشاً بوضوح",
+                                    "common_errors": "الإكثار من الطهي مما يفقده طراوته",
+                                    "hygiene_rules": "نظافة الأسطح واستخدام أدوات معقمة",
+                                    "notes": "يقدم في المناسبات والأفراح."
                                 }
                             ],
                             "recipes": [
                                 {
-                                    "id": "rec_default_1",
-                                    "name": "وصفة تارت الشوكولاتة الفاخرة",
-                                    "ingredients": "قاعدة Pâte Sucrée، قاناش الشوكولاتة",
-                                    "quantities": "حسب البطاقة التقنية لكل مكون",
-                                    "steps": "خبز القاعدة أعمى، صب الحشوة، والتبريد.",
-                                    "prep_time": "45 دقيقة",
-                                    "bake_time": "20 دقيقة",
-                                    "temperature": "170°C",
-                                    "servings": "8 حصص",
-                                    "notes": "تزين بالبندق المحمص."
+                                    "id": "rec_makrood",
+                                    "name": "وصفة مقروط اللوز الأصيل",
+                                    "ingredients": "لوز، سكر، ماء زهر، قشور الليمون",
+                                    "quantities": "حسب البطاقة التقنية",
+                                    "steps": "تشكيل حربوش، تقطيع مقروضات، الطهي والتغليس.",
+                                    "prep_time": "50 دقيقة",
+                                    "bake_time": "15 دقيقة",
+                                    "temperature": "160°C",
+                                    "servings": "30 حبة",
+                                    "notes": "يغمس في ماء زهر وماء ورد ثم يغبر بسكر رطب فائق الجودة."
                                 }
                             ]
+                        }
+                    ]
+                },
+                {
+                    "id": "unit_m_west",
+                    "name": "حلويات غربية",
+                    "lessons": [
+                        {
+                            "id": "les_m_west",
+                            "name": "فن صناعة الحلويات الغربية والباتيسري",
+                            "content": "تحضير الكيك الفاخر، التارتليت، والتشيز كيك بمعايير عالمية.",
+                            "objectives": "التمكن من تقنيات الباتيسري الحديثة.",
+                            "competencies": "الدقة في القياسات والتزيين الاحترافي.",
+                            "pedagogy": "العرض المرئي والتطبيق الورشاتي الموجه.",
+                            "steps": "1. خفق البسكويت. 2. إعداد الكريمة. 3. التجميع.",
+                            "evaluation": "تقييم المظهر الخارجي والتذوق.",
+                            "technical_sheets": [],
+                            "recipes": []
+                        }
+                    ]
+                },
+                {
+                    "id": "unit_m_east",
+                    "name": "حلويات شرقية",
+                    "lessons": [
+                        {
+                            "id": "les_m_east",
+                            "name": "صناعة الحلويات الشرقية الفاخرة",
+                            "content": "تحضير البقلاوة، الكنافة، والقطايف بأسسها الصحيحة.",
+                            "objectives": "إتقان العجائن المورقة والشرقية.",
+                            "competencies": "التحكم في درجات حرارة القطر والخبز.",
+                            "pedagogy": "التطبيق العملي المتسلسل.",
+                            "steps": "1. فرد طبقات العجين. 2. حشو المكسرات. 3. السقي بالقطر الساخن.",
+                            "evaluation": "تقييم القرمشة والتشرب المتوازن للقطر.",
+                            "technical_sheets": [],
+                            "recipes": []
                         }
                     ]
                 }
@@ -85,24 +171,16 @@ DEFAULT_DATA = {
     "exams": [
         {
             "id": "exam_default_1",
-            "title": "الامتحان التطبيقي في العجائن والتقنيات الأساسية",
-            "program_id": "prog_default_1",
-            "unit_id": "unit_default_1",
-            "lesson_id": "lesson_default_1",
+            "title": "الامتحان الشامل في التقنيات والوصفات",
+            "program_id": "prog_makatha",
+            "unit_id": "unit_m_trad",
+            "lesson_id": "les_m_trad",
             "questions": [
                 {
-                    "id": "q_default_1",
-                    "text": "ما هي الفائدة الأساسية من إضافة السكر أو البودرة في Pâte Sucrée؟",
+                    "id": "q_1",
+                    "text": "ما هي درجة الحرارة المناسبة لخبز مقروط اللوز دون أن يتغير لونه؟",
                     "type": "mcq",
-                    "options": ["الحصول على قوام مقرمش ومتجانس", "زيادة نسبة الرطوبة", "منع تضاعف الحجم"],
-                    "answer": 0,
-                    "points": 5
-                },
-                {
-                    "id": "q_default_2",
-                    "text": "يتم عجن العجينة المكسورة لفترة طويلة لتطوير مادة الغلوتين.",
-                    "type": "true_false",
-                    "options": ["خطأ", "صحيح"],
+                    "options": ["160°C", "220°C", "100°C"],
                     "answer": 0,
                     "points": 5
                 }
@@ -113,7 +191,6 @@ DEFAULT_DATA = {
     "documents": []
 }
 
-# دوال البيانات الآمنة مع المعالجة الهندسية للتحقق والتوافق
 def load_data():
     if not os.path.exists(DATA_FILE):
         save_data(DEFAULT_DATA)
@@ -148,7 +225,6 @@ def save_data(data):
     except Exception as e:
         st.error(f"حدث خطأ أثناء حفظ البيانات: {e}")
 
-# تهيئة Session State
 if "db" not in st.session_state:
     st.session_state.db = load_data()
 
@@ -172,7 +248,6 @@ if "active_exam_id" not in st.session_state:
 
 db = st.session_state.db
 
-# التصميم والهوية البصرية (RTL + CSS متوافق)
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap');
@@ -201,7 +276,6 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# شريط التنقل العلوي والإشراف
 col_title, col_nav1, col_nav2, col_nav3, col_nav4 = st.columns([2, 1, 1, 1, 1])
 with col_title:
     platform_title = db.get("settings", {}).get("platform_name", "المنصة البيداغوجية للتكوين المهني (APC)")
@@ -233,9 +307,6 @@ supervisor_text = db.get("settings", {}).get("supervisor_name", "إشراف ال
 st.markdown(f'<div class="supervisor-badge">✨ {supervisor_text}</div>', unsafe_allow_html=True)
 st.markdown("---")
 
-# ---------------------------------------------------------
-# 1. تسجيل دخول الإدارة
-# ---------------------------------------------------------
 if st.session_state.current_view == "admin_login":
     st.subheader("تسجيل دخول المشرف (الإدارة)")
     pwd = st.text_input("كلمة المرور", type="password", key="admin_pwd_input")
@@ -249,9 +320,6 @@ if st.session_state.current_view == "admin_login":
         else:
             st.error("كلمة المرور غير صحيحة.")
 
-# ---------------------------------------------------------
-# 2. لوحة الإدارة الشاملة
-# ---------------------------------------------------------
 elif st.session_state.current_view == "admin_dashboard":
     if not st.session_state.is_admin:
         st.warning("يرجى تسجيل الدخول أولاً.")
@@ -287,7 +355,7 @@ elif st.session_state.current_view == "admin_dashboard":
             
             if prog_obj:
                 with st.form("add_unit_form"):
-                    u_name = st.text_input("اسم الوحدة الجديدة")
+                    u_name = st.text_input("اسم الوحدة أو التخصص الجديد")
                     if st.form_submit_button("إضافة الوحدة") and u_name:
                         prog_obj["units"].append({
                             "id": f"unit_{uuid.uuid4().hex[:8]}",
@@ -317,7 +385,7 @@ elif st.session_state.current_view == "admin_dashboard":
         if db["programs"]:
             p_choice = st.selectbox("اختر البرنامج للدرس", db["programs"], format_func=lambda x: x["name"], key="l_p_admin")
             if p_choice.get("units"):
-                u_choice = st.selectbox("اختر الوحدة", p_choice["units"], format_func=lambda x: x["name"], key="l_u_admin")
+                u_choice = st.selectbox("اختر الوحدة أو النظير", p_choice["units"], format_func=lambda x: x["name"], key="l_u_admin")
                 
                 with st.form("add_lesson_full"):
                     l_name = st.text_input("عنوان الدرس")
@@ -363,11 +431,11 @@ elif st.session_state.current_view == "admin_dashboard":
             
             with st.form("add_tech_sheet_form"):
                 ts_title = st.text_input("اسم البطاقة التقنية")
-                ts_cat = st.text_input("الصنف (مثال: عجائن، كريمات، معجنات)")
+                ts_cat = st.text_input("الصنف (مثال: حلويات تقليدية، غربية، شرقية)")
                 ts_ing = st.text_area("المكونات")
                 ts_qty = st.text_area("الكميات والوحدات")
                 ts_steps = st.text_area("خطوات التحضير")
-                ts_temp = st.text_input("درجة الحرارة (مثال: 180°C)")
+                ts_temp = st.text_input("درجة الحرارة (مثال: 160°C)")
                 ts_bake = st.text_input("وقت الطهي")
                 ts_prep = st.text_input("وقت التحضير")
                 ts_eq = st.text_area("المعدات المطلوبة")
@@ -494,7 +562,7 @@ elif st.session_state.current_view == "admin_dashboard":
 
     with tab6:
         st.subheader("إدارة الوثائق والملفات ونتائج المتربصين")
-        uploaded_file = st.file_uploader("رفع ملف جديد (PDF, DOCX, XLSX, PPTX, PNG, JPG, JPEG)", type=["pdf", "docx", "xlsx", "pptx", "png", "jpg", "jpeg"])
+        uploaded_file = st.file_uploader("رفع ملف جديد", type=["pdf", "docx", "xlsx", "pptx", "png", "jpg", "jpeg"])
         if uploaded_file is not None:
             file_ext = os.path.splitext(uploaded_file.name)[1]
             safe_filename = f"{uuid.uuid4().hex[:8]}{file_ext}"
@@ -519,7 +587,7 @@ elif st.session_state.current_view == "admin_dashboard":
         for doc in list(db.get("documents", [])):
             col_d1, col_d2 = st.columns([3, 1])
             with col_d1:
-                st.write(f"📄 {doc.get('title', 'ملف بدون عنوان')} (رفع في: {doc.get('date', 'غير محدد')})")
+                st.write(f"📄 {doc.get('title', 'ملف بدون عنوان')}")
             with col_d2:
                 if st.button("حذف الملف", key=f"del_doc_{doc['id']}"):
                     path_to_rm = doc.get("path")
@@ -536,7 +604,6 @@ elif st.session_state.current_view == "admin_dashboard":
         st.subheader("📊 نتائج الامتحانات المسجلة للمتربصين:")
         if db.get("results"):
             for res in db["results"]:
-                res_id = res.get("id", "res_old")
                 st.markdown(f"""
                 <div class="card-custom">
                     <b>المتربص:</b> {res.get('student_name', '')} | <b>الامتحان:</b> {res.get('exam_title', '')} | <b>التاريخ:</b> {res.get('date', '')}<br>
@@ -562,12 +629,9 @@ elif st.session_state.current_view == "admin_dashboard":
             st.success("تم حفظ الإعدادات بنجاح!")
             st.rerun()
 
-# ---------------------------------------------------------
-# 3. نظام البحث الشامل
-# ---------------------------------------------------------
 elif st.session_state.current_view == "search":
     st.header("🔍 البحث الشامل في محتوى المنصة")
-    query = st.text_input("أدخل كلمة البحث للوصول المباشر", key="global_search_input").strip().lower()
+    query = st.text_input("أدخل كلمة البحث", key="global_search_input").strip().lower()
     
     if query:
         found = False
@@ -583,19 +647,15 @@ elif st.session_state.current_view == "search":
             for u in p.get("units", []):
                 if query in u.get("name", "").lower():
                     found = True
-                    st.success(f"📂 وحدة: {u.get('name', '')} (تابعة لـ {p.get('name', '')})")
+                    st.success(f"📂 وحدة/تخصص: {u.get('name', '')} (تابعة لـ {p.get('name', '')})")
+                    if st.button(f"عرض تفاصيل {u.get('name', '')}", key=f"s_u_{u['id']}"):
+                        st.session_state.selected_program_id = p["id"]
+                        st.session_state.selected_unit_id = u["id"]
+                        st.session_state.current_view = "unit_view"
+                        st.rerun()
                 
                 for l in u.get("lessons", []):
-                    match_lesson = (
-                        query in l.get("name", "").lower() or
-                        query in l.get("content", "").lower() or
-                        query in l.get("objectives", "").lower() or
-                        query in l.get("competencies", "").lower() or
-                        query in l.get("pedagogy", "").lower() or
-                        query in l.get("steps", "").lower() or
-                        query in l.get("evaluation", "").lower()
-                    )
-                    if match_lesson:
+                    if query in l.get("name", "").lower() or query in l.get("content", "").lower():
                         found = True
                         st.warning(f"📖 درس: {l.get('name', '')}")
                         if st.button("فتح الدرس مباشرة", key=f"s_l_{l['id']}"):
@@ -604,50 +664,10 @@ elif st.session_state.current_view == "search":
                             st.session_state.selected_lesson_id = l["id"]
                             st.session_state.current_view = "lesson_view"
                             st.rerun()
-                    
-                    for ts in l.get("technical_sheets", []):
-                        match_ts = (
-                            query in ts.get("title", "").lower() or
-                            query in ts.get("category", "").lower() or
-                            query in ts.get("ingredients_list", "").lower() or
-                            query in ts.get("quantities", "").lower() or
-                            query in ts.get("equipment", "").lower()
-                        )
-                        if match_ts:
-                            found = True
-                            st.info(f"📋 بطاقة تقنية: {ts.get('title', '')} (مرتبطة بدرس: {l.get('name', '')})")
-                            if st.button("عرض الدرس والبطاقة", key=f"s_ts_{ts['id']}"):
-                                st.session_state.selected_program_id = p["id"]
-                                st.session_state.selected_unit_id = u["id"]
-                                st.session_state.selected_lesson_id = l["id"]
-                                st.session_state.current_view = "lesson_view"
-                                st.rerun()
-                    
-                    for rec in l.get("recipes", []):
-                        match_rec = (
-                            query in rec.get("name", "").lower() or
-                            query in rec.get("ingredients", "").lower() or
-                            query in rec.get("quantities", "").lower()
-                        )
-                        if match_rec:
-                            found = True
-                            st.success(f"🧁 وصفة: {rec.get('name', '')} (مرتبطة بدرس: {l.get('name', '')})")
-
-        for doc in db.get("documents", []):
-            if query in doc.get("title", "").lower() or query in doc.get("name", "").lower():
-                found = True
-                st.info(f"📄 وثيقة: {doc.get('title', '')}")
-                doc_path = doc.get("path")
-                if doc_path and os.path.exists(doc_path):
-                    with open(doc_path, "rb") as f:
-                        st.download_button("تنزيل الوثيقة", f, file_name=doc.get("title", "document"), key=f"dl_search_{doc['id']}")
 
         if not found:
             st.warning("لم يتم العثور على نتائج تطابق بحثك.")
 
-# ---------------------------------------------------------
-# 4. نظام الامتحانات للمتربصين
-# ---------------------------------------------------------
 elif st.session_state.current_view == "exams":
     st.header("📝 الامتحانات المتاحة للمتربصين")
     if not db.get("exams"):
@@ -666,13 +686,11 @@ elif st.session_state.current_view == "exams":
                     st.session_state.active_exam_id = ex["id"]
                     st.session_state.current_view = "exam_session"
                     st.rerun()
-            else:
-                st.warning("هذا الامتحان لا يحتوي على أسئلة حالياً.")
 
 elif st.session_state.current_view == "exam_session":
     ex_obj = next((e for e in db.get("exams", []) if e["id"] == st.session_state.active_exam_id), None)
     if not ex_obj or not ex_obj.get("questions"):
-        st.error("الامتحان غير موجود أو لا يحتوي على أسئلة.")
+        st.error("الامتحان غير موجود.")
         st.session_state.current_view = "exams"
         st.rerun()
     
@@ -717,16 +735,10 @@ elif st.session_state.current_view == "exam_session":
                 save_data(db)
                 
                 st.success(f"🎉 النتيجة النهائية للمتربص {student_name}: {score} / {total} ({percentage}%) - {status}")
-                if st.button("العودة لقائمة الامتحانات", key="back_to_exams_after_res"):
-                    st.session_state.current_view = "exams"
-                    st.rerun()
 
-# ---------------------------------------------------------
-# 5. التنقل الهرمي للبرامج والدروس والبطاقات
-# ---------------------------------------------------------
 elif st.session_state.current_view == "home":
     st.header("🌟 برامج التكوين المهني في فنون الطهي وصناعة الحلويات")
-    st.markdown("اختر البرنامج المناسب لبدء التصفح الهرمي:")
+    st.markdown("اختر البرنامج الأساسي المناسب للتصفح الهرمي:")
     
     if not db.get("programs"):
         st.info("لا توجد برامج متاحة حالياً.")
@@ -738,7 +750,7 @@ elif st.session_state.current_view == "home":
                 <p>{p.get('description', '')}</p>
             </div>
             """, unsafe_allow_html=True)
-            if st.button(f"استعراض وحدات البرنامج: {p.get('name', '')}", key=f"p_btn_{p['id']}"):
+            if st.button(f"استعراض أقسام وتخصصات: {p.get('name', '')}", key=f"p_btn_{p['id']}"):
                 st.session_state.selected_program_id = p["id"]
                 st.session_state.current_view = "program_view"
                 st.rerun()
@@ -752,24 +764,47 @@ elif st.session_state.current_view == "program_view":
             st.rerun()
             
         st.markdown("---")
+        st.markdown("### الفروع والنوافذ المتاحة ضمن هذا البرنامج:")
         if not prog.get("units"):
-            st.info("لا توجد وحدات في هذا البرنامج.")
+            st.info("لا توجد وحدات أو فروع مضافة في هذا البرنامج.")
         else:
             for u in prog["units"]:
-                st.subheader(f"📂 الوحدة: {u.get('name', '')}")
-                if u.get("lessons"):
-                    for l in u["lessons"]:
-                        col_l1, col_l2 = st.columns([3, 1])
-                        with col_l1:
-                            st.write(f"📖 درس: **{l.get('name', '')}**")
-                        with col_l2:
-                            if st.button("فتح الدرس والبطاقات", key=f"open_l_{l['id']}"):
-                                st.session_state.selected_unit_id = u["id"]
-                                st.session_state.selected_lesson_id = l["id"]
-                                st.session_state.current_view = "lesson_view"
-                                st.rerun()
-                else:
-                    st.write("لا توجد دروس مضافة في هذه الوحدة.")
+                st.markdown(f"""
+                <div class="card-custom">
+                    <h4>📂 {u.get('name', '')}</h4>
+                </div>
+                """, unsafe_allow_html=True)
+                col_u1, col_u2 = st.columns([3, 1])
+                with col_u2:
+                    if st.button(f"فتح النافذة", key=f"open_u_{u['id']}"):
+                        st.session_state.selected_unit_id = u["id"]
+                        st.session_state.current_view = "unit_view"
+                        st.rerun()
+
+elif st.session_state.current_view == "unit_view":
+    prog = next((p for p in db.get("programs", []) if p["id"] == st.session_state.selected_program_id), None)
+    unit = next((u for u in prog.get("units", []) if u["id"] == st.session_state.selected_unit_id), None) if prog else None
+    
+    if unit:
+        st.header(f"📂 النافذة / الفرع: {unit.get('name', '')}")
+        if st.button("← العودة للبرنامج السابق", key="back_prog_from_unit"):
+            st.session_state.current_view = "program_view"
+            st.rerun()
+            
+        st.markdown("---")
+        st.markdown("### الدروس والمحتويات البيداغوجية المتوفرة:")
+        if not unit.get("lessons"):
+            st.info("لا توجد دروس مضافة في هذه النافذة حالياً.")
+        else:
+            for l in unit["lessons"]:
+                col_l1, col_l2 = st.columns([3, 1])
+                with col_l1:
+                    st.write(f"📖 درس: **{l.get('name', '')}**")
+                with col_l2:
+                    if st.button("فتح الدرس والبطاقات", key=f"open_l_{l['id']}"):
+                        st.session_state.selected_lesson_id = l["id"]
+                        st.session_state.current_view = "lesson_view"
+                        st.rerun()
 
 elif st.session_state.current_view == "lesson_view":
     prog = next((p for p in db.get("programs", []) if p["id"] == st.session_state.selected_program_id), None)
@@ -778,8 +813,8 @@ elif st.session_state.current_view == "lesson_view":
     
     if lesson:
         st.header(f"📖 الدرس: {lesson.get('name', '')}")
-        if st.button("← العودة للوحدة السابقة", key="back_prog_btn"):
-            st.session_state.current_view = "program_view"
+        if st.button("← العودة للنافذة السابقة", key="back_unit_btn"):
+            st.session_state.current_view = "unit_view"
             st.rerun()
             
         st.markdown(f"""
