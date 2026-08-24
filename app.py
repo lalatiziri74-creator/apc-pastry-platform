@@ -131,7 +131,7 @@ DEFAULT_DATA = {
 }
 
 # ========================================================================
-# 3. إدارة الجلسة
+# 3. إدارة الجلسة والدوال المساعدة
 # ========================================================================
 def init_session():
     if "app_data" not in st.session_state:
@@ -183,7 +183,7 @@ def render_ingredients(ingredients, factor=1):
     return html
 
 # ========================================================================
-# 4. الصفحات
+# 4. الصفحات (الرئيسية، البرامج الفرعية، التفاصيل)
 # ========================================================================
 def render_home():
     st.markdown('<div class="main-header"><h1 style="font-size:2.2rem;">🍰 منصة <span style="color:#b8860b;">الشيف البيداغوجي</span></h1><p style="color:#6b7280;">منصة تكوين مهني جزائرية في صناعة الحلويات التقليدية</p><p style="font-size:0.8rem;color:#9ca3af;">إعداد الأستاذة: <strong style="color:#92400e;">حورية فرحي</strong> © 2026</p></div>', unsafe_allow_html=True)
@@ -280,6 +280,7 @@ def render_program_detail():
             return
         is_sub = False
 
+    # أزرار التحكم في التعديل والقفل
     col1, col2, col3 = st.columns([1,1,2])
     with col1:
         if st.session_state.locked:
@@ -312,6 +313,7 @@ def render_program_detail():
                 st.session_state.page = "home"
                 st.rerun()
 
+    # عرض معلومات البرنامج
     if st.session_state.edit_mode and not st.session_state.locked:
         with st.form(key="edit_program_main"):
             new_title = st.text_input("العنوان", value=p["title"])
@@ -330,6 +332,7 @@ def render_program_detail():
     else:
         st.markdown(f"<h2 style='font-size:1.8rem;'>{p['title']}</h2><p style='color:#6b7280;'>{p['desc']}</p><div style='display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.5rem;'><span style='background:#fef3c7;padding:0.2rem 1rem;border-radius:999px;'>{p['hours']} ساعة</span><span class='badge-pending'>{p['status']}</span></div>", unsafe_allow_html=True)
 
+    # التفاصيل الثابتة
     if p.get("timeDistribution") and len(p["timeDistribution"]) > 0:
         with st.expander("⏱️ التوزيع الزمني", expanded=True):
             st.table([{"المرحلة": row["stage"], "المدة": row["duration"], "ملاحظات": row.get("notes", "")} for row in p["timeDistribution"]])
@@ -355,6 +358,7 @@ def render_program_detail():
             st.markdown("- تنظيم مكان العمل\n- تنفيذ المراحل\n- التشطيب والتزيين")
         st.markdown("**📜 الكفاءة النهائية:** ينجز المتكوّن حلوى تقليدية جزائرية قائمة على اللوز وفق الوصفة والتقنيات المهنية، مع احترام الجودة والنظافة والسلامة.")
 
+    # الوحدات والبطاقات
     modules = p.get("modules", [])
     st.subheader(f"📚 الوحدات ({len(modules)})")
 
@@ -433,7 +437,7 @@ def render_program_detail():
                                     st.markdown(render_ingredients(card["ingredients"]), unsafe_allow_html=True)
 
 # ========================================================================
-# 5. الإدارة
+# 5. لوحة الإدارة
 # ========================================================================
 def render_admin():
     st.markdown('<div class="admin-box">', unsafe_allow_html=True)
